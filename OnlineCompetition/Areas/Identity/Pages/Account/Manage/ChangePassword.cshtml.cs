@@ -52,9 +52,17 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
             public string ConfirmPassword { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string Id)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = new ApplicationUser();
+            if (string.IsNullOrEmpty(Id) == true)
+            {
+                user = await _userManager.GetUserAsync(User);
+            }
+            else
+            {
+                user = await _userManager.FindByIdAsync(Id);
+            }
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -69,14 +77,22 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string Id)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            var user = await _userManager.GetUserAsync(User);
+            var user = new ApplicationUser();
+            if (string.IsNullOrEmpty(Id) == true)
+            {
+                user = await _userManager.GetUserAsync(User);
+            }
+            else
+            {
+                user = await _userManager.FindByIdAsync(Id);
+            }
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");

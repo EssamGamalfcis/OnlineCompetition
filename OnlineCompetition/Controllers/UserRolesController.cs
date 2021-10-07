@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AdminPanel.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OnlineCompetition.MVC.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserRolesController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -38,6 +41,7 @@ namespace OnlineCompetition.MVC.Controllers
         public async Task<IActionResult> Manage(string userId)
         {
             ViewBag.userId = userId;
+            HttpContext.Session.SetString("userId", userId);
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using AdminPanel.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
 {
@@ -16,15 +17,17 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-
+        private readonly IWebHostEnvironment _hostEnvironment;
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _hostEnvironment = hostEnvironment;
         }
-
+        public string ImagePath { get; set; }
         public string Username { get; set; }
 
         [TempData]
@@ -46,8 +49,8 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
-            [Display(Name = "Profile Picture")]
-            public byte[] ProfilePicture { get; set; }
+            [Display(Name = "Username")]
+            public string ImagePath { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -56,7 +59,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             var firstName = user.FirstName;
             var lastName = user.LastName;
-            var profilePicture = user.ProfilePicture;
+            ImagePath = user.ImagePath;
             Username = userName;
 
             Input = new InputModel
@@ -65,13 +68,27 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
                 Username = userName,
                 FirstName = firstName,
                 LastName = lastName,
-                ProfilePicture = profilePicture
+                ImagePath = ImagePath
             };
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string Id)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = new ApplicationUser();
+            if (string.IsNullOrEmpty(Id) == true)
+            {
+                user = await _userManager.GetUserAsync(User);
+                try
+                {
+                    HttpContext.Session.SetString("userId", null);
+                }
+                catch (Exception e)
+                { }
+            }
+            else
+            {
+                user = await _userManager.FindByIdAsync(Id);
+            }
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -81,9 +98,17 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(IFormFile file, string Id)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = new ApplicationUser();
+            if (string.IsNullOrEmpty(Id) == true)
+            {
+                user = await _userManager.GetUserAsync(User);
+            }
+            else
+            {
+                user = await _userManager.FindByIdAsync(Id);
+            }
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -102,7 +127,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
+                    return RedirectToPage(new { Id = Id });
                 }
             }
             var firstName = user.FirstName;
@@ -126,36 +151,39 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
                     if (userNameExists != null)
                     {
                         StatusMessage = "User name already taken. Select a different username.";
-                        return RedirectToPage();
+                        return RedirectToPage(new { Id = Id });
                     }
 
                     var setUserName = await _userManager.SetUserNameAsync(user, Input.Username);
                     if (!setUserName.Succeeded)
                     {
                         StatusMessage = "Unexpected error when trying to set user name.";
-                        return RedirectToPage();
+                        return RedirectToPage(new { Id = Id });
                     }
                     else
                     {
                         user.UsernameChangeLimit -= 1;
-                        await _userManager.UpdateAsync(user);
                     }
                 }
-            }
-
-            if (Request.Form.Files.Count > 0)
-            {
-                IFormFile file = Request.Form.Files.FirstOrDefault();
-                using (var dataStream = new MemoryStream())
+                if (file != null)
                 {
-                    await file.CopyToAsync(dataStream);
-                    user.ProfilePicture = dataStream.ToArray();
+                    string wwwRootPath = _hostEnvironment.WebRootPath;
+                    string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                    string extension = Path.GetExtension(file.FileName);
+                    Input.ImagePath = fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                    string path = Path.Combine(wwwRootPath + "/img/", fileName);
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    user.ImagePath = Input.ImagePath;
+
                 }
                 await _userManager.UpdateAsync(user);
             }
-            await _signInManager.RefreshSignInAsync(user);
+            //await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+            return RedirectToPage(new { Id = Id });
         }
     }
 }

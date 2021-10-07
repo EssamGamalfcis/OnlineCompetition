@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using AdminPanel.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
 {
@@ -30,6 +31,13 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
+            try
+            {
+                HttpContext.Session.SetString("userId", null);
+            }
+            catch (Exception e)
+            { 
+            }
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {

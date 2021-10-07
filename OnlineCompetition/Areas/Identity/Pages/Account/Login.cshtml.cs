@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using AdminPanel.Models;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
 {
@@ -22,14 +24,16 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         public LoginModel(SignInManager<ApplicationUser> signInManager,
             ILogger<LoginModel> logger,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _hostEnvironment = hostEnvironment;
         }
 
         [BindProperty]
@@ -82,9 +86,10 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var userName = Input.Email;
+                var user = new ApplicationUser();
                 if (IsValidEmail(Input.Email))
                 {
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                     user = await _userManager.FindByEmailAsync(Input.Email);
                     if (user != null)
                     {
                         userName = user.UserName;
@@ -94,6 +99,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    HttpContext.Session.SetString("ImageFullPath", _hostEnvironment.WebRootPath + ("\\img\\" + user.ImagePath));
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

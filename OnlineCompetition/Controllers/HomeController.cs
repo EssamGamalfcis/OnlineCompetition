@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AdminPanel.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OnlineCompetition.MVC.Controllers
 {
@@ -17,7 +18,7 @@ namespace OnlineCompetition.MVC.Controllers
         {
             _logger = logger;
         }
-
+        [Authorize]
         public IActionResult Index()
         {
             return View();

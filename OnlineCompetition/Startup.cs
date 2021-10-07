@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AdminPanel;
 using AdminPanel.Models;
+using System;
 
 namespace OnlineCompetition.MVC
 {
@@ -27,8 +28,14 @@ namespace OnlineCompetition.MVC
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultUI()
             .AddDefaultTokenProviders();
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+            services.AddControllersWithViews().AddSessionStateTempDataProvider();
+            services.AddRazorPages().AddSessionStateTempDataProvider();
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".AdventureWorks.Session";
+                options.IdleTimeout = TimeSpan.FromSeconds(500000);
+                options.Cookie.IsEssential = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +54,7 @@ namespace OnlineCompetition.MVC
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseRouting();
 
