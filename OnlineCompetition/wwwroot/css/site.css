@@ -183,3 +183,6 @@ body {
     float: right;
     right: 25px;
 }
+.dropdown-item {
+cursor:pointer;
+}
