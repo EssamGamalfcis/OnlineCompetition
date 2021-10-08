@@ -186,3 +186,13 @@ body {
 .dropdown-item {
 cursor:pointer;
 }
+.partialViewModal {
+    background-color: #add5f1;
+    margin-top: 10%;
+    border-radius: 15px;
+    direction: rtl;
+}
+.partalViewModalLables {
+    float: right;
+    margin: 3%;
+}

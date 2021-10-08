@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using AdminPanel;
 using AdminPanel.Models;
 using System;
+using Microsoft.AspNetCore.Mvc;
 
 namespace OnlineCompetition.MVC
 {
@@ -36,6 +37,7 @@ namespace OnlineCompetition.MVC
                 options.IdleTimeout = TimeSpan.FromSeconds(500000);
                 options.Cookie.IsEssential = true;
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

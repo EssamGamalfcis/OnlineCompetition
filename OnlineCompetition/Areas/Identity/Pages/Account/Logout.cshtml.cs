@@ -33,7 +33,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
             await _signInManager.SignOutAsync();
             try
             {
-                HttpContext.Session.SetString("userId", null);
+                HttpContext.Session.SetString("userId", "");
             }
             catch (Exception e)
             { 

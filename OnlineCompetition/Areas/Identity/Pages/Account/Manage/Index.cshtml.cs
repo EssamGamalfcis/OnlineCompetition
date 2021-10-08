@@ -49,7 +49,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
-            [Display(Name = "Username")]
+            [Display(Name = "Profile Picture")]
             public string ImagePath { get; set; }
         }
 
@@ -80,7 +80,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Manage
                 user = await _userManager.GetUserAsync(User);
                 try
                 {
-                    HttpContext.Session.SetString("userId", null);
+                    HttpContext.Session.SetString("userId", user.Id);
                 }
                 catch (Exception e)
                 { }

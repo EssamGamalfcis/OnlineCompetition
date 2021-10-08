@@ -29,7 +29,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">أعدادات المسابقات</a>
                                 <div class="dropdown-menu" aria-labelledby="navdrop2">
-                                    <a class="dropdown-item"  asp-controller="Competitions" asp-action="Index">أضافة مسابقة جديدة</a>
+                                    <a class="dropdown-item"  asp-controller="Competitions" asp-action="Cometition_Index">أضافة مسابقة جديدة</a>
                                     <a class="dropdown-item">أضافة أسألة جديدة</a>
                                     <a class="dropdown-item">ربط الاسألة بالمسابقة</a>
                                     <a class="dropdown-item">ربط المستخدمين بالمسابقات</a>
@@ -50,6 +50,8 @@
                         {
                               <li class="nav-item">
                                   <a class="nav-link">المسابقات</a>
+                              </li><li class="nav-item">
+                                  <a class="nav-link">الاستبيان</a>
                               </li>
                          }
                         @if (User.IsInRole("Teacher") || User.IsInRole("Corrector"))
@@ -58,6 +60,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link">مراجعة المسابقات</a>
                                 </li>
+                                <li class="nav-item">
+                                  <a class="nav-link">الاستبيان</a>
+                              </li>
                          }
                     </ul>
                 </div>
@@ -71,9 +76,9 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
+        @*<div class="container">
             &copy; 2021 - OnlineCompetition.MVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+        </div>*@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

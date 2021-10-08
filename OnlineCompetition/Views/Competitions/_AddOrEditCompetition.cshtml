@@ -1,0 +1,106 @@
+﻿@model OnlineCompetition.Models.Competitions
+@{
+        string checkedOrNot = Model.IsActive ? "Checked" : "";
+        string duration = Model.Duration == 0 ? "" : Model.Duration.ToString();
+    <div class="form-row">
+        <div class="col">
+            <label for="CompetitionNameAr" class="partalViewModalLables">أسم المسابقة<span style="color:red">*</span></label>
+            <input type="text" id="CompetitionNameAr" class="form-control" value="@Model.NameAR" placeholder="أسم المسابقة">
+        </div>
+        <div class="col">
+            <label for="CompetitionNameEn" class="partalViewModalLables">Cometition Name<span style="color:red">*</span></label>
+            <input type="text" id="CompetitionNameEn" class="form-control" value="@Model.NameEN" placeholder="Cometition Name">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col">
+            <label for="CompetitionDuration" class="partalViewModalLables">مدة المسابقة / دقيقة<span style="color:red">*</span></label>
+            <input type="number" min="0" id="CompetitionDuration" class="form-control" value="@duration" placeholder="مدة المسابقة">
+        </div>
+        <div class="col">
+            <label for="CompetitionIsActive" class="partalViewModalLables" style=" margin-right: 47%;">نشط<span style="color:red">*</span></label>
+            <input type="checkbox" style="margin-top: 11%; height: 30px; width: 30px; margin-right: 47%;" id="CompetitionIsActive" @checkedOrNot class="form-control">
+        </div>
+    </div>
+    <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
+        <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
+            <div class="spinner-border" id="Loader" role="status" style="display:none !important">
+            </div>
+        </div>
+
+        <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="CompetitionSaveChange()" value="حفظ" />
+        <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
+    </div>
+
+}
+
+<script>
+
+    function CompetitionSaveChange() {
+
+        $('#Loader').show();
+        $('#SaveBtn').hide();
+        $('#CancelBtn').hide();
+        var objToSend = {};
+        objToSend.Id = '@Model.Id';
+        objToSend.IsActive = $('#CompetitionIsActive').is(':checked');
+        objToSend.Duration = $('#CompetitionDuration').val();
+        objToSend.NameAR = $('#CompetitionNameAr').val();
+        objToSend.NameEN = $('#CompetitionNameEn').val();
+        if (objToSend.Duration > 1000 || objToSend.Duration <= 0 ||
+            objToSend.NameAR == '' || objToSend.NameEN == '')
+        {
+            Swal.fire(
+                'تنبية',
+                'برجاء ملئ البيانات بشكل صحيح',
+                'warning'
+            );
+            $('#Loader').hide();
+            $('#SaveBtn').show();
+            $('#CancelBtn').show();
+            return 0;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddOrUpdateCompetition")",
+            data: { obj: objToSend},
+            dataType: "text",
+            success: function (response) {
+                if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
+                    Swal.fire(
+                        'جيد',
+                        'تم الحفظ بنجاح',
+                        'success'
+                    ).then((result) => {
+                        Cancel();
+                        location.reload();
+                    })
+                   
+                }
+                else {
+                    Swal.fire(
+                        'تنبية',
+                        'برجاء المحاولة فى وقت أخر',
+                        'warning'
+                    );
+                    $('#Loader').hide();
+                    $('#SaveBtn').show();
+                    $('#CancelBtn').show();
+                }
+            },
+            error: function (req, status, error) {
+                Swal.fire(
+                    'تنبية',
+                    'خطأ بالسيرفر',
+                    'warning'
+                );
+                $('#Loader').hide();
+                $('#SaveBtn').show();
+                $('#CancelBtn').show();
+            }
+        });
+        
+    }
+    
+</script>

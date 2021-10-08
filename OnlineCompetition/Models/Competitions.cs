@@ -10,5 +10,8 @@ namespace OnlineCompetition.Models
     {
         [Required]
         public int Duration { get; set; }
+        [Required]
+        public bool IsActive { get; set; } = true;
+
     }
 }
