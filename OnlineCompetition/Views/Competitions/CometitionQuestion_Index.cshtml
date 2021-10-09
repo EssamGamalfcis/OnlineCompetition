@@ -1,81 +1,78 @@
 ﻿@using AdminPanel.Models
-@model List<OnlineCompetition.Models.Competitions>
+@model List<CompetitionQuestionsVM>
 @{ ViewData["Title"] = "Cometition Index";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <link href="~/css/fontawesome.css" rel="stylesheet" />
 <script src="~/js/sweetalert2.js"></script>
 
-<h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">أعدادت المسابقة</h1>
+<h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">أعدادت ألاسألة</h1>
 
-<div id='addCompetitionModal' class='modal fade' data-url='@Url.Action("AddOrEditCompetition")?id=0'>
-    <div id='addCompetitionContainer' class="container partialViewModal">
+<div id='addCompetitionQuestionModal' class='modal fade' data-url='@Url.Action("AddOrEditCompetitionQuestions")?id=0'>
+    <div id='addCompetitionQuestionContainer' class="container partialViewModal">
     </div>
 </div>
 
-<button id='addCompetition' class="btn btn-primary btn-outline-primary" style="float: right; margin: 10px;">أضافة مسابقة</button>
+<button id='addCompetitionQuestion' class="btn btn-primary btn-outline-primary" style="float: right; margin: 10px;">أضافة سؤال</button>
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>أسم المسابقة</th>
-            <th>تاريخ الانشاء</th>
-            <th>المدة</th>
-            <th>نشط</th>
+            <th>أسم السؤال</th>
+            <th>المسابقة</th>
+            <th>نوع الاجابة</th>
+            <th>الاجابات</th>
+            <th>الاجابة الصحيحة</th>
+            <th>الترتيب</th>
             <th style="text-align:center">تعديل / حذف</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var OnlineCompetition in Model)
+        @foreach (var OnlineCompetitionQuestion in Model)
         {
-<tr>
-    <td>@OnlineCompetition.NameAR</td>
-    <td>@OnlineCompetition.CreationDate.ToString("yyyy/dd/mm")</td>
-    <td>@OnlineCompetition.Duration</td>
-    @{
-    if(OnlineCompetition.IsActive == true)
-    {
-    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10004;</span></td>
-    }
-    else
-    {
-    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10008;</span></td>
-    }
-    }
-    <td style="text-align:center">
-        <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" onclick="Delete(this)">Delete</a>
-        <a class="btn btn-primary" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" id="editCompetition">Update</a>
-    </td>
-</tr> }
+            string answers = string.Join("&#13;", OnlineCompetitionQuestion.CompetitionQuestionsAnswers);
+            <tr>
+                  <td>@OnlineCompetitionQuestion.NameAR</td>
+                  <td>@OnlineCompetitionQuestion.CompetitionAR</td>
+                  <td>@OnlineCompetitionQuestion.AnswerType.ToString()</td>
+                  <td title="@answers">HoverHere</td>
+                  <td>@OnlineCompetitionQuestion.RightAnswerAR</td>
+                  <td>@OnlineCompetitionQuestion.Sort</td>
+                  <td style="text-align:center">
+                      <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetitionQuestion.Id" onclick="Delete(this)">Delete</a>
+                      <a class="btn btn-primary" style="cursor: pointer; color: white;" competitionId="@OnlineCompetitionQuestion.Id" id="editCompetitionQuestions">Update</a>
+                  </td>
+            </tr> 
+         }
             </tbody>
         </table>
         <script>
             $(document).ready(function () {
-                $('#addCompetition').click(function () {
-                    var url = $('#addCompetitionModal').data('url');
+                $('#addCompetitionQuestion').click(function () {
+                    var url = $('#addCompetitionQuestionModal').data('url');
                     $.get(url, function (data) {
-                        $('#addCompetitionContainer').html(data);
-                        $("#addCompetitionModal").addClass("in");
+                        $('#addCompetitionQuestionContainer').html(data);
+                        $("#addCompetitionQuestionModal").addClass("in");
                         $(".modal-backdrop").show()
-                        $("#addCompetitionModal").show();
-                        $('#addCompetitionModal').modal('show');
+                        $("#addCompetitionQuestionModal").show();
+                        $('#addCompetitionQuestionModal').modal('show');
                     });
                 });
-                $('#editCompetition').click(function () {
-                    var url = $('#addCompetitionModal').data('url');
+                $('#editCompetitionQuestions').click(function () {
+                    var url = $('#addCompetitionQuestionModal').data('url');
                     url = url.replace('0', $(this).attr('competitionid'))
                     $.get(url, function (data) {
-                        $('#addCompetitionContainer').html(data);
-                        $("#addCompetitionModal").addClass("in");
+                        $('#addCompetitionQuestionContainer').html(data);
+                        $("#addCompetitionQuestionModal").addClass("in");
                         $(".modal-backdrop").show()
-                        $("#addCompetitionModal").show();
-                        $('#addCompetitionModal').modal('show');
+                        $("#addCompetitionQuestionModal").show();
+                        $('#addCompetitionQuestionModal').modal('show');
                     });
                 });
             });
             function Cancel() {
-                $("#addCompetitionModal").removeClass("in");
+                $("#addCompetitionQuestionModal").removeClass("in");
                 $(".modal-backdrop").hide()
-                $("#addCompetitionModal").hide();
+                $("#addCompetitionQuestionModal").hide();
             }
             function Delete(obj) {
                 var objToSend = {};

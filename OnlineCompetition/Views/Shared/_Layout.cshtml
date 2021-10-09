@@ -21,23 +21,23 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navdrop1" role="button" data-toggle="dropdown" data-hover="dropdown">أعدادات المستخدمين</a>
-                                <div class="dropdown-menu" aria-labelledby="navdrop1">
+                                <div class="dropdown-menu" aria-labelledby="navdrop1" style="text-align: justify;">
                                     <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">أضافة مستخدم جديد</a>
                                     <a class="dropdown-item" asp-area="" asp-controller="UserRoles" asp-action="Index">تحديد هوية المستخدم</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">أعدادات المسابقات</a>
-                                <div class="dropdown-menu" aria-labelledby="navdrop2">
+                                <div class="dropdown-menu" aria-labelledby="navdrop2" style="text-align: justify;">
                                     <a class="dropdown-item"  asp-controller="Competitions" asp-action="Cometition_Index">أضافة مسابقة جديدة</a>
-                                    <a class="dropdown-item">أضافة أسألة جديدة</a>
+                                    <a class="dropdown-item"  asp-controller="Competitions" asp-action="CometitionQuestion_Index">أضافة أسألة جديدة</a>
                                     <a class="dropdown-item">ربط الاسألة بالمسابقة</a>
                                     <a class="dropdown-item">ربط المستخدمين بالمسابقات</a>
                                 </div>
                             </li>
                              <li class="nav-item dropdown">
                                  <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">أعدادات الأستبيان</a>
-                                 <div class="dropdown-menu" aria-labelledby="navdrop2">
+                                 <div class="dropdown-menu" aria-labelledby="navdrop2" style="text-align: justify;">
                                      <a class="dropdown-item">أضافة استبيان جديد</a>
                                      <a class="dropdown-item">اضافة الأصناف للأستبيان</a>
                                      <a class="dropdown-item">اضافة عناصر الأصناف</a>
