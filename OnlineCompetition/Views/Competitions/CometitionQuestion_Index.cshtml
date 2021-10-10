@@ -18,10 +18,7 @@
     <thead>
         <tr>
             <th>أسم السؤال</th>
-            <th>المسابقة</th>
             <th>نوع الاجابة</th>
-            <th>الاجابات</th>
-            <th>الاجابة الصحيحة</th>
             <th>الترتيب</th>
             <th style="text-align:center">تعديل / حذف</th>
         </tr>
@@ -29,13 +26,9 @@
     <tbody>
         @foreach (var OnlineCompetitionQuestion in Model)
         {
-            string answers = string.Join("&#13;", OnlineCompetitionQuestion.CompetitionQuestionsAnswers);
             <tr>
                   <td>@OnlineCompetitionQuestion.NameAR</td>
-                  <td>@OnlineCompetitionQuestion.CompetitionAR</td>
                   <td>@OnlineCompetitionQuestion.AnswerType.ToString()</td>
-                  <td title="@answers">HoverHere</td>
-                  <td>@OnlineCompetitionQuestion.RightAnswerAR</td>
                   <td>@OnlineCompetitionQuestion.Sort</td>
                   <td style="text-align:center">
                       <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetitionQuestion.Id" onclick="Delete(this)">Delete</a>

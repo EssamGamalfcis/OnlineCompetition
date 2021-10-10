@@ -2,7 +2,7 @@
 
 namespace OnlineCompetition.MVC.Migrations
 {
-    public partial class CompetationModelUpdate2 : Migration
+    public partial class answers4 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

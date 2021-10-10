@@ -1,32 +1,19 @@
 ﻿@model CompetitionQuestionsVM
-@{
+@{}
     <div class="form-row">
         <div class="col">
             <label for="CompetitionQuestionNameAr" class="partalViewModalLables">أسم السؤال<span style="color:red">*</span></label>
             <input type="text" id="CompetitionQuestionNameAr" class="form-control" value="@Model.NameAR" placeholder="أسم السؤال">
         </div>
         <div class="col">
-            <label for="CompetitionId" class="partalViewModalLables" style="margin-right: 11.5%;">أسم المسابقة<span style="color:red">*</span></label>
-            <select class="custom-select" id="CompetitionId"  style="width: 200px; margin-left: 52%; ">
-                @{ foreach (var item in Model.Competitions)
-                    {
-                        if (Model.Competitions.First() == item || Model.CompetitionId == item.Id)
-                        {
-                            <option value="@item.Id" selected>@item.NameAR</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Id">@item.NameAR</option>
-                        }
-                    }
-                }
-            </select>
+            <label for="CompetitionQuestionSort" class="partalViewModalLables">ترتيب السؤال<span style="color:red">*</span></label>
+            <input type="number" id="CompetitionQuestionSort" class="form-control" value="@Model.Sort" placeholder="ترتيب السؤال">
         </div>
     </div>
     <div class="form-row">
         <div class="col">
-            <label for="CompetitionQuestionSort" class="partalViewModalLables">ترتيب السؤال<span style="color:red">*</span></label>
-            <input type="number" min="0" id="CompetitionQuestionSort" class="form-control" value="@Model.Sort" placeholder="ترتيب السؤال">
+            <label for="CompetitionQuestionTotalGrade" class="partalViewModalLables">درجة السؤال<span style="color:red">*</span></label>
+            <input type="number" id="CompetitionQuestionTotalGrade" class="form-control" value="@Model.TotalGrade" placeholder="درجة السؤال">
         </div>
         <div class="col">
             <label for="CompetitionAnswerType" class="partalViewModalLables" style="margin-right: 13%;">نوع الاجابة<span style="color:red">*</span></label>
@@ -59,43 +46,9 @@
                 }
             </select>
         </div>
-        @{
-            if ((int)Model.AnswerType == 1)
-            {
-                <div class="col" id="NumberOfAnswersDiv">
-                            <select class="custom-select" id="NumberOfAnswers" style="width:150px;">
-                                @{
-                                    for (int i = 2; i < 6; i++)
-                                    {
-                                        if (Model.CompetitionQuestionsAnswers.Count - 1 == i)
-                                        {
-                                            <option value="@i" selected>@i</option>
-                                        }
-                                        else
-                                        { 
-                                            <option value="@i">@i</option>
-                                        }
-                                    }
-                                }
-                            </select>
-                </div>
-            }
-            else
-            {
-                <div class="col" style="display: none;" id="NumberOfAnswersDiv">
-                    <select class="custom-select" id="NumberOfAnswers" style="width: 150px;">
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-            }
-        }
-
     </div>
 
-    <div class="form-row">
+    @*<div class="form-row">
         @{ if ((int)Model.AnswerType == 0)
             {
                 <div id="MultiAnswers" class="col" style="display:none">
@@ -153,18 +106,17 @@
                 </div>
             }
         }
-    </div>
+    </div>*@
         <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
             <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
                 <div class="spinner-border" id="Loader" role="status" style="display:none !important">
                 </div>
             </div>
 
-            <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="CompetitionSaveChange()" value="حفظ" />
+            <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="CompetitionQuestionSaveChange()" value="حفظ" />
             <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
         </div>
 
-        }
 
         <script>
 

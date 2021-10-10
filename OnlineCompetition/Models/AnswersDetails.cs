@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace OnlineCompetition.Models
 {
-    public class CompetitionsQuestions : BaseClass
+    public class AnswersDetails
     {
-        public virtual Competitions Competition { get; set; }
-        public long? CompetitionId { get; set; }
-        public int Sort { get; set; } = 0;
+        public long Id { get; set; }
+        public AnswersMaster AnswerMaster { get; set; }
+        public string AnswerText { get; set; }
     }
 }

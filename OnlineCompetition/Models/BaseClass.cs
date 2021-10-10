@@ -8,6 +8,7 @@ namespace OnlineCompetition.Models
 {
     public class BaseClass
     {
+        [Key]
         public long Id { get; set; }
 
         [Required]

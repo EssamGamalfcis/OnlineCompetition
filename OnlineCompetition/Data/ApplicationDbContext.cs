@@ -13,7 +13,9 @@ namespace AdminPanel
     {
         public DbSet<Competitions> Competitions { get;set;}
         public DbSet<CompetitionsQuestions> CompetitionsQuestions { get;set;}
-        public DbSet<CompetitionsQuestionsAnswers> CompetitionsQuestionsAnswers { get;set;}
+        public DbSet<AnswersMaster> AnswersMaster { get;set;}
+        public DbSet<AnswersDetails> AnswersDetails { get;set;}
+        public DbSet<QuestionsAnswers> QuestionsAnswers { get; set; }
         public DbSet<CompetitionsUsers> CompetitionsUsers { get;set;}
         public DbSet<Questionnaire> Questionnaire { get;set;}
         public DbSet<QuestionnaireAnswers> QuestionnaireAnswers { get;set;}
