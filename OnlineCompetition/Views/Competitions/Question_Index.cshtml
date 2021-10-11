@@ -8,68 +8,68 @@
 
 <h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">أعدادت ألاسألة</h1>
 
-<div id='addCompetitionQuestionModal' class='modal fade' data-url='@Url.Action("AddOrEditCompetitionQuestions")?id=0'>
-    <div id='addCompetitionQuestionContainer' class="container partialViewModal">
+<div id='addQuestionModal' class='modal fade' data-url='@Url.Action("AddOrEditQuestions")?id=0'>
+    <div id='addQuestionContainer' class="container partialViewModal">
     </div>
 </div>
 
-<button id='addCompetitionQuestion' class="btn btn-primary btn-outline-primary" style="float: right; margin: 10px;">أضافة سؤال</button>
+<button id='addQuestion' class="btn btn-primary btn-outline-primary" style="float: right; margin: 10px;">أضافة سؤال</button>
 <table class="table table-striped">
     <thead>
         <tr>
             <th>أسم السؤال</th>
-            <th>نوع الاجابة</th>
             <th>الترتيب</th>
+            <th>الدرجة</th>
             <th style="text-align:center">تعديل / حذف</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var OnlineCompetitionQuestion in Model)
+        @foreach (var Question in Model)
         {
-            <tr>
-                  <td>@OnlineCompetitionQuestion.NameAR</td>
-                  <td>@OnlineCompetitionQuestion.AnswerType.ToString()</td>
-                  <td>@OnlineCompetitionQuestion.Sort</td>
-                  <td style="text-align:center">
-                      <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetitionQuestion.Id" onclick="Delete(this)">Delete</a>
-                      <a class="btn btn-primary" style="cursor: pointer; color: white;" competitionId="@OnlineCompetitionQuestion.Id" id="editCompetitionQuestions">Update</a>
-                  </td>
-            </tr> 
+        <tr>
+            <td>@Question.NameAR</td>
+            <td>@Question.Sort</td>
+            <td>@Question.TotalScore</td>
+            <td style="text-align:center">
+                <a class="btn btn-danger" style="cursor: pointer; color: white;" questionId="@Question.Id" onclick="Delete(this)">Delete</a>
+                <a class="btn btn-primary" style="cursor: pointer; color: white;" questionId="@Question.Id" id="editQuestions">Update</a>
+            </td>
+        </tr> 
          }
             </tbody>
         </table>
         <script>
             $(document).ready(function () {
-                $('#addCompetitionQuestion').click(function () {
-                    var url = $('#addCompetitionQuestionModal').data('url');
+                $('#addQuestion').click(function () {
+                    var url = $('#addQuestionModal').data('url');
                     $.get(url, function (data) {
-                        $('#addCompetitionQuestionContainer').html(data);
-                        $("#addCompetitionQuestionModal").addClass("in");
+                        $('#addQuestionContainer').html(data);
+                        $("#addQuestionModal").addClass("in");
                         $(".modal-backdrop").show()
-                        $("#addCompetitionQuestionModal").show();
-                        $('#addCompetitionQuestionModal').modal('show');
+                        $("#addQuestionModal").show();
+                        $('#addQuestionModal').modal('show');
                     });
                 });
-                $('#editCompetitionQuestions').click(function () {
-                    var url = $('#addCompetitionQuestionModal').data('url');
+                $('#editQuestions').click(function () {
+                    var url = $('#addQuestionModal').data('url');
                     url = url.replace('0', $(this).attr('competitionid'))
                     $.get(url, function (data) {
-                        $('#addCompetitionQuestionContainer').html(data);
-                        $("#addCompetitionQuestionModal").addClass("in");
+                        $('#addQuestionContainer').html(data);
+                        $("#addQuestionModal").addClass("in");
                         $(".modal-backdrop").show()
-                        $("#addCompetitionQuestionModal").show();
-                        $('#addCompetitionQuestionModal').modal('show');
+                        $("#addQuestionModal").show();
+                        $('#addQuestionModal').modal('show');
                     });
                 });
             });
             function Cancel() {
-                $("#addCompetitionQuestionModal").removeClass("in");
+                $("#addQuestionModal").removeClass("in");
                 $(".modal-backdrop").hide()
-                $("#addCompetitionQuestionModal").hide();
+                $("#addQuestionModal").hide();
             }
             function Delete(obj) {
                 var objToSend = {};
-                objToSend.Id = $(obj).attr('competitionId');
+                objToSend.Id = $(obj).attr('questionId');
                 Swal.fire({
                     title: 'تأكيد',
                     text: "هل انت متأكد من الحذف",
@@ -82,7 +82,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "POST",
-                            url: "@Url.Action("DeleteCompetition")",
+                            url: "@Url.Action("DeleteQuestion")",
                             data: { obj: objToSend },
                             dataType: "text",
                             success: function (response) {
@@ -95,7 +95,6 @@
                                         Cancel();
                                         location.reload();
                                     })
-
                                 }
                                 else {
                                     Swal.fire(

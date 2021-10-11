@@ -1,0 +1,92 @@
+﻿@model OnlineCompetition.Models.Questions
+@{}
+       <div class="form-row">
+           <div class="col">
+               <label for="QuestionNameAr" class="partalViewModalLables">أسم السؤال<span style="color:red">*</span></label>
+               <input type="text" id="QuestionNameAr" class="form-control" value="@Model.NameAR" placeholder="أسم السؤال">
+           </div>
+           <div class="col">
+               <label for="QuestionSort" class="partalViewModalLables">ترتيب السؤال<span style="color:red">*</span></label>
+               <input type="number" id="QuestionSort" class="form-control" value="@Model.Sort" placeholder="ترتيب السؤال">
+           </div>
+           <div class="col">
+               <label for="QuestionTotalScore" class="partalViewModalLables">درجة السؤال<span style="color:red">*</span></label>
+               <input type="number" id="QuestionTotalScore" class="form-control" value="@Model.TotalScore" placeholder="درجة السؤال">
+           </div>
+       </div>
+        <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
+            <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
+                <div class="spinner-border" id="Loader" role="status" style="display:none !important">
+                </div>
+            </div>
+            <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="QuestionSaveChange()" value="حفظ" />
+            <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
+        </div>
+<script>
+    function QuestionSaveChange() {
+
+        $('#Loader').show();
+        $('#SaveBtn').hide();
+        $('#CancelBtn').hide();
+        var objToSend = {};
+        objToSend.Id = '@Model.Id';
+        objToSend.NameAR = $('#QuestionNameAr').val();
+        objToSend.NameEN = $('#QuestionNameAr').val();
+        objToSend.Sort = $('#QuestionNameAr').val();
+        objToSend.TotalScore = $('#QuestionNameAr').val();
+        if (objToSend.Duration > 1000 || objToSend.Duration <= 0 ||
+            objToSend.NameAR == '' || objToSend.NameEN == '')
+        {
+            Swal.fire(
+                'تنبية',
+                'برجاء ملئ البيانات بشكل صحيح',
+                'warning'
+            );
+            $('#Loader').hide();
+            $('#SaveBtn').show();
+            $('#CancelBtn').show();
+            return 0;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddOrUpdateQuestions")",
+            data: { obj: objToSend},
+            dataType: "text",
+            success: function (response) {
+                if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
+                    Swal.fire(
+                        'جيد',
+                        'تم الحفظ بنجاح',
+                        'success'
+                    ).then((result) => {
+                        Cancel();
+                        location.reload();
+                    })
+
+                }
+                else {
+                    Swal.fire(
+                        'تنبية',
+                        'برجاء المحاولة فى وقت أخر',
+                        'warning'
+                    );
+                    $('#Loader').hide();
+                    $('#SaveBtn').show();
+                    $('#CancelBtn').show();
+                }
+            },
+            error: function (req, status, error) {
+                Swal.fire(
+                    'تنبية',
+                    'خطأ بالسيرفر',
+                    'warning'
+                );
+                $('#Loader').hide();
+                $('#SaveBtn').show();
+                $('#CancelBtn').show();
+            }
+        });
+
+    }
+        </script>

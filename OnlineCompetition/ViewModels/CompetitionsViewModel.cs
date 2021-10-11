@@ -21,7 +21,7 @@ namespace AdminPanel.Models
         [Required]
         public string NameEN { get; set; }
     }
-    public class CompetitionsDeleteVM
+    public class DeleteVM
     {
         public long Id { get; set; }
     }
