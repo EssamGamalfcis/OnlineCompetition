@@ -148,7 +148,10 @@ namespace OnlineCompetition.MVC.Controllers
                 else
                 {
                     var objToUpdate = await _db.Questions.FirstOrDefaultAsync(x => x.Id == obj.Id);
-                    objToUpdate = obj;
+                    objToUpdate.NameAR = obj.NameAR;
+                    objToUpdate.NameEN = obj.NameEN;
+                    objToUpdate.Sort = obj.Sort;
+                    objToUpdate.TotalScore = obj.TotalScore;
                     objToUpdate.CreationDate = DateTime.Now;
                     objToUpdate.IsDeleted = false;
                     await _db.SaveChangesAsync();

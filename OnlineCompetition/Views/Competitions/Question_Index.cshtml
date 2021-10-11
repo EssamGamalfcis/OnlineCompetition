@@ -52,7 +52,7 @@
                 });
                 $('#editQuestions').click(function () {
                     var url = $('#addQuestionModal').data('url');
-                    url = url.replace('0', $(this).attr('competitionid'))
+                    url = url.replace('0', $(this).attr('questionId'))
                     $.get(url, function (data) {
                         $('#addQuestionContainer').html(data);
                         $("#addQuestionModal").addClass("in");
