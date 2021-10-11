@@ -117,38 +117,39 @@ namespace OnlineCompetition.MVC.Controllers
             }
         }
         /*end of Competition Setup*/
-        //public async Task<ActionResult> CometitionQuestion_Index()
-        //{
-        //    var data = new List<CompetitionQuestionsVM>();
-        //    var competitionsQuestions = await _db.CompetitionsQuestions.Where(x => x.IsDeleted != true).OrderByDescending(x => x.CreationDate).ToListAsync();
-        //    foreach (var competitionsQuestion in competitionsQuestions)
-        //    {
-        //        CompetitionQuestionsVM newObj = new CompetitionQuestionsVM();
-        //        Competitions competition = new Competitions();
-        //        competition = _db.Competitions.FirstOrDefault(x => x.Id == competitionsQuestion.CompetitionId);
-        //        //List<CompetitionQuestionsAnswersVM> answers =  _db.CompetitionsQuestionsAnswers.Where(x => x.CompetitionsQuestionsId == competitionsQuestion.Id).
-        //        //    Select(y=> new CompetitionQuestionsAnswersVM { 
-        //        //                                                Id = y.Id,
-        //        //                                                NameAR = y.NameAR,
-        //        //                                                NameEN = y.NameEN}).ToList();
-        //        newObj.Id = competitionsQuestion.Id;
-        //        newObj.NameAR = competitionsQuestion.NameAR;
-        //        newObj.NameEN = competitionsQuestion.NameEN;
-        //        //newObj.RightAnswerCode = competitionsQuestion.RightCompetitionQuestionAnswerCode == null ? null : answers.FirstOrDefault(x => x.Id == competitionsQuestion.RightCompetitionQuestionAnswerCode.Value).Id;
-        //        //newObj.RightAnswerAR = competitionsQuestion.RightCompetitionQuestionAnswerCode == null ? null : answers.FirstOrDefault(x => x.Id == competitionsQuestion.RightCompetitionQuestionAnswerCode.Value).NameAR;
-        //        //newObj.RightAnswerEN = competitionsQuestion.RightCompetitionQuestionAnswerCode == null ? null : answers.FirstOrDefault(x => x.Id == competitionsQuestion.RightCompetitionQuestionAnswerCode.Value).NameEN;
-                
-        //        //newObj.AnswerType = competitionsQuestion.AnswerType;
-        //        //newObj.CompetitionQuestionsAnswers = answers;
-        //        newObj.CompetitionId = competition.Id;
-        //        newObj.CompetitionAR = competition.NameAR;
-        //        newObj.CompetitionEN = competition.NameEN;
-        //        newObj.Sort = competitionsQuestion.Sort;
-        //        newObj.TotalGrade = competitionsQuestion.TotalGrade;
-        //        data.Add(newObj);
-        //    }
-        //    return View(data);
-        //}
+        /*qesutions Setup*/
+        public async Task<ActionResult> Question_Index()
+        {
+            var data = await _db.Questions.Where(x => x.IsDeleted != true).OrderByDescending(x => x.CreationDate).ToListAsync();
+            return View(data);
+            //foreach (var competitionsQuestion in competitionsQuestions)
+            //{
+            //    CompetitionQuestionsVM newObj = new CompetitionQuestionsVM();
+            //    Competitions competition = new Competitions();
+            //    competition = _db.Competitions.FirstOrDefault(x => x.Id == competitionsQuestion.CompetitionId);
+            //    //List<CompetitionQuestionsAnswersVM> answers =  _db.CompetitionsQuestionsAnswers.Where(x => x.CompetitionsQuestionsId == competitionsQuestion.Id).
+            //    //    Select(y=> new CompetitionQuestionsAnswersVM { 
+            //    //                                                Id = y.Id,
+            //    //                                                NameAR = y.NameAR,
+            //    //                                                NameEN = y.NameEN}).ToList();
+            //    newObj.Id = competitionsQuestion.Id;
+            //    newObj.NameAR = competitionsQuestion.NameAR;
+            //    newObj.NameEN = competitionsQuestion.NameEN;
+            //    //newObj.RightAnswerCode = competitionsQuestion.RightCompetitionQuestionAnswerCode == null ? null : answers.FirstOrDefault(x => x.Id == competitionsQuestion.RightCompetitionQuestionAnswerCode.Value).Id;
+            //    //newObj.RightAnswerAR = competitionsQuestion.RightCompetitionQuestionAnswerCode == null ? null : answers.FirstOrDefault(x => x.Id == competitionsQuestion.RightCompetitionQuestionAnswerCode.Value).NameAR;
+            //    //newObj.RightAnswerEN = competitionsQuestion.RightCompetitionQuestionAnswerCode == null ? null : answers.FirstOrDefault(x => x.Id == competitionsQuestion.RightCompetitionQuestionAnswerCode.Value).NameEN;
+
+            //    //newObj.AnswerType = competitionsQuestion.AnswerType;
+            //    //newObj.CompetitionQuestionsAnswers = answers;
+            //    newObj.CompetitionId = competition.Id;
+            //    newObj.CompetitionAR = competition.NameAR;
+            //    newObj.CompetitionEN = competition.NameEN;
+            //    newObj.Sort = competitionsQuestion.Sort;
+            //    newObj.TotalGrade = competitionsQuestion.TotalGrade;
+            //    data.Add(newObj);
+            //}
+
+        }
         //[HttpGet]
         //public async Task<ActionResult> AddOrEditCompetitionQuestions(long? id)
         //{

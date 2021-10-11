@@ -4,14 +4,16 @@ using AdminPanel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace OnlineCompetition.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211011112128_Seperate Questions5")]
+    partial class SeperateQuestions5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,58 +228,6 @@ namespace OnlineCompetition.MVC.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserTokens");
-                });
-
-            modelBuilder.Entity("OnlineCompetition.Models.AnswersDetails", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("AnswerMasterId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("AnswerText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnswerMasterId");
-
-                    b.ToTable("AnswersDetails");
-                });
-
-            modelBuilder.Entity("OnlineCompetition.Models.AnswersMaster", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AnswerType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NameAR")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEN")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AnswersMaster");
                 });
 
             modelBuilder.Entity("OnlineCompetition.Models.Competitions", b =>
@@ -502,88 +452,6 @@ namespace OnlineCompetition.MVC.Migrations
                     b.ToTable("QuestionnaireUsers");
                 });
 
-            modelBuilder.Entity("OnlineCompetition.Models.Questions", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NameAR")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEN")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Sort")
-                        .HasColumnType("int");
-
-                    b.Property<float>("TotalScore")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Questions");
-                });
-
-            modelBuilder.Entity("OnlineCompetition.Models.QuestionsAnswers", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("AnswersDetailsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("AnswersMasterId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CompetitionsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NameAR")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEN")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("QuestionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnswersMasterId");
-
-                    b.HasIndex("CompetitionsId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("QuestionsAnswers");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -633,13 +501,6 @@ namespace OnlineCompetition.MVC.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("OnlineCompetition.Models.AnswersDetails", b =>
-                {
-                    b.HasOne("OnlineCompetition.Models.AnswersMaster", "AnswerMaster")
-                        .WithMany()
-                        .HasForeignKey("AnswerMasterId");
                 });
 
             modelBuilder.Entity("OnlineCompetition.Models.CompetitionsUsers", b =>
@@ -693,21 +554,6 @@ namespace OnlineCompetition.MVC.Migrations
                     b.HasOne("AdminPanel.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId1");
-                });
-
-            modelBuilder.Entity("OnlineCompetition.Models.QuestionsAnswers", b =>
-                {
-                    b.HasOne("OnlineCompetition.Models.AnswersMaster", "AnswersMaster")
-                        .WithMany()
-                        .HasForeignKey("AnswersMasterId");
-
-                    b.HasOne("OnlineCompetition.Models.Competitions", "Competitions")
-                        .WithMany()
-                        .HasForeignKey("CompetitionsId");
-
-                    b.HasOne("OnlineCompetition.Models.Questions", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId");
                 });
 #pragma warning restore 612, 618
         }

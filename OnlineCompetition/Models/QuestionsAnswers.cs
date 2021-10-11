@@ -9,7 +9,8 @@ namespace OnlineCompetition.Models
 {
     public class QuestionsAnswers : BaseClass
     {
-        public CompetitionsQuestions CompetitionsQuestions { get; set; }
+        public Competitions Competitions { get; set; }
+        public Questions Question { get; set; }
         //public long? CompetitionsQuestionsId { get; set; }
         public AnswersMaster AnswersMaster { get; set; }
         //public long? AnswersMasterId { get; set; }

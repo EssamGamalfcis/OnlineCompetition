@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace OnlineCompetition.Models
 {
-    public class CompetitionsQuestions : BaseClass
+    public class Questions : BaseClass
     {
-        public virtual Competitions Competition { get; set; }
-        public long? CompetitionId { get; set; }
         public int Sort { get; set; } = 0;
+        public float TotalScore { get; set; } = 10;
     }
 }

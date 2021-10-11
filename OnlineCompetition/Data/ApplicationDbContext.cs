@@ -12,7 +12,7 @@ namespace AdminPanel
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Competitions> Competitions { get;set;}
-        public DbSet<CompetitionsQuestions> CompetitionsQuestions { get;set;}
+        public DbSet<Questions> Questions { get;set;}
         public DbSet<AnswersMaster> AnswersMaster { get;set;}
         public DbSet<AnswersDetails> AnswersDetails { get;set;}
         public DbSet<QuestionsAnswers> QuestionsAnswers { get; set; }

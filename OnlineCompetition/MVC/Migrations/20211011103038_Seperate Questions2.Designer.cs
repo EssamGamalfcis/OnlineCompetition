@@ -4,14 +4,16 @@ using AdminPanel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace OnlineCompetition.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211011103038_Seperate Questions2")]
+    partial class SeperateQuestions2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -534,7 +536,7 @@ namespace OnlineCompetition.MVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Questions");
+                    b.ToTable("CompetitionsQuestions");
                 });
 
             modelBuilder.Entity("OnlineCompetition.Models.QuestionsAnswers", b =>
@@ -551,6 +553,9 @@ namespace OnlineCompetition.MVC.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long?>("CompetitionsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CompetitionsQuestionsId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreationDate")
@@ -570,16 +575,13 @@ namespace OnlineCompetition.MVC.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("QuestionId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AnswersMasterId");
 
                     b.HasIndex("CompetitionsId");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("CompetitionsQuestionsId");
 
                     b.ToTable("QuestionsAnswers");
                 });
@@ -705,9 +707,9 @@ namespace OnlineCompetition.MVC.Migrations
                         .WithMany()
                         .HasForeignKey("CompetitionsId");
 
-                    b.HasOne("OnlineCompetition.Models.Questions", "Question")
+                    b.HasOne("OnlineCompetition.Models.Questions", "CompetitionsQuestions")
                         .WithMany()
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("CompetitionsQuestionsId");
                 });
 #pragma warning restore 612, 618
         }
