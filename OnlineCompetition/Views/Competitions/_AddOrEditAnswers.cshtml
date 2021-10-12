@@ -1,0 +1,154 @@
+﻿@model AnsewrsVM
+@{
+    int answerType = (int)Model.AnswersMaster.AnswerType;
+ }
+       <div class="form-row">
+           <div class="col">
+               <label for="AnswerName" class="partalViewModalLables">أسم الاجابة<span style="color:red">*</span></label>
+               <input type="text" id="AnswerName" class="form-control" value="@Model.AnswersMaster.NameAR" placeholder="أسم ألاجابة">
+           </div>
+           <div class="col">
+               <label for="AnswerType" class="partalViewModalLables">نوع الاجابة<span style="color:red">*</span></label>
+               <select class="form-control" id="AnswerType" onchange="ShowAndHideChoices()">
+                   <option value="0" selected>صح وخطأ</option>
+                   <option value="1">أختيارات متعددة</option>
+                   <option value="2">مقالى</option>
+               </select>
+           </div>
+           <div class="col" id="AnswersNumberDiv" style="display:none">
+               <label for="AnswersNumber" class="partalViewModalLables">عدد الاجابات</label>
+               <select class="form-control" id="AnswersNumber" onchange="ShowAndHideAnswers()">
+                   <option value="2" selected>اختيارين</option>
+                   <option value="3">3 اختيارات</option>
+                   <option value="4">4 اختيارات</option>
+                   <option value="5">5 اختيارات</option>
+               </select>
+           </div>
+       </div>
+       <div class="form-row" id="multiAnswers" style="display:none">
+           <div class="col">
+               <input class="form-control form-control-sm" type="text" style="margin-top: 10px;" placeholder="الاجابة الاولى">
+               <input class="form-control form-control-sm" type="text" style="margin-top: 10px;" placeholder="الاجابة الثانية">
+               <input class="form-control form-control-sm" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الثالثة" id="multiAnswers3">
+               <input class="form-control form-control-sm" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الرابعة" id="multiAnswers4">
+               <input class="form-control form-control-sm" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الخامسة" id="multiAnswers5">
+           </div>
+       </div>
+        <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
+            <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
+                <div class="spinner-border" id="Loader" role="status" style="display:none !important">
+                </div>
+            </div>
+            <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="AnswerSaveChange()" value="حفظ" />
+            <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
+        </div>
+<script>
+
+    var answerMasterId = '@Model.AnswersMaster.Id';
+    if (answerMasterId != '0') {
+        $('#AnswerType').val(@answerType);
+        $('#AnswersNumber').val(@Model.AnswersDetails.Count());
+        ShowAndHideChoices();
+        ShowAndHideAnswers();
+    }
+
+    function ShowAndHideChoices() {
+        debugger;
+        if ($('#AnswerType').val() == 1) {
+            $('#AnswersNumberDiv').show();
+            $('#multiAnswers').show();
+        }
+        else {
+            $('#multiAnswers').hide();
+            $('#AnswersNumberDiv').hide();
+        }
+    }
+    function ShowAndHideAnswers() {
+        if ($('#AnswersNumber').val() == 2) {
+            $('#multiAnswers3').hide();
+            $('#multiAnswers4').hide();
+            $('#multiAnswers5').hide();
+        }
+        else if ($('#AnswersNumber').val() == 3) {
+            $('#multiAnswers3').show();
+            $('#multiAnswers4').hide();
+            $('#multiAnswers5').hide();
+        }
+        else if ($('#AnswersNumber').val() == 4) {
+            $('#multiAnswers3').show();
+            $('#multiAnswers4').show();
+            $('#multiAnswers5').hide();
+        }
+        else if ($('#AnswersNumber').val() == 5) {
+            $('#multiAnswers3').show();
+            $('#multiAnswers4').show();
+            $('#multiAnswers5').show();
+        }
+    }
+    function AnswerSaveChange() {
+
+        $('#Loader').show();
+        $('#SaveBtn').hide();
+        $('#CancelBtn').hide();
+        var objToSend = {};
+        objToSend.Id = '@Model.AnswersMaster.Id';
+        objToSend.NameAR = $('#QuestionNameAr').val();
+        objToSend.NameEN = $('#QuestionNameAr').val();
+        objToSend.Sort = $('#QuestionSort').val();
+        objToSend.TotalScore = $('#QuestionTotalScore').val();
+        if (objToSend.Duration > 1000 || objToSend.Duration <= 0 ||
+            objToSend.NameAR == '' || objToSend.NameEN == '')
+        {
+            Swal.fire(
+                'تنبية',
+                'برجاء ملئ البيانات بشكل صحيح',
+                'warning'
+            );
+            $('#Loader').hide();
+            $('#SaveBtn').show();
+            $('#CancelBtn').show();
+            return 0;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddOrUpdateQuestions")",
+            data: { obj: objToSend},
+            dataType: "text",
+            success: function (response) {
+                if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
+                    Swal.fire(
+                        'جيد',
+                        'تم الحفظ بنجاح',
+                        'success'
+                    ).then((result) => {
+                        Cancel();
+                        location.reload();
+                    })
+
+                }
+                else {
+                    Swal.fire(
+                        'تنبية',
+                        'برجاء المحاولة فى وقت أخر',
+                        'warning'
+                    );
+                    $('#Loader').hide();
+                    $('#SaveBtn').show();
+                    $('#CancelBtn').show();
+                }
+            },
+            error: function (req, status, error) {
+                Swal.fire(
+                    'تنبية',
+                    'خطأ بالسيرفر',
+                    'warning'
+                );
+                $('#Loader').hide();
+                $('#SaveBtn').show();
+                $('#CancelBtn').show();
+            }
+        });
+
+    }
+        </script>

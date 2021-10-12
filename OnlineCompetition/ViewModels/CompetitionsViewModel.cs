@@ -50,4 +50,9 @@ namespace AdminPanel.Models
         public string NameEN { get; set; }
         public bool? IsRightAnswer { get; set; }
     }
+    public class AnsewrsVM
+    {
+        public AnswersMaster AnswersMaster { get; set; }
+        public List<AnswersDetails> AnswersDetails { get; set; }
     }
+}
