@@ -49,7 +49,7 @@
                         @if (User.IsInRole("Student"))
                         {
                               <li class="nav-item">
-                                  <a class="nav-link">المسابقات</a>
+                                  <a class="nav-link" asp-controller="Competitions" asp-action="CometitionStudnet_Index">المسابقات</a>
                               </li><li class="nav-item">
                                   <a class="nav-link">الاستبيان</a>
                               </li>

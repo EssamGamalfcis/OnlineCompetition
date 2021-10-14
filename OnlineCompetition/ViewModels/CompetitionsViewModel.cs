@@ -74,4 +74,30 @@ namespace AdminPanel.Models
     {
         public List<CompetitionsUsers> CompetitionStudnets { get; set; }
     }
+    public class CompetitionStudentToSolveVM
+    {
+        public Competitions Competitions { get; set; }
+        public CompetitionsUsers CompetitionsUsers { get; set; }
+        public double TotalScore { get; set; }
+        public double? ActualScore { get; set; }
+        public bool? SolvedBefore { get; set; }
+    }
+    public class CompetitionQuestionsForStudentVM
+    {
+        public Competitions Competitions { get; set; }
+        public List<QuestionWithAnswersVM> Questions { get; set; }
+    }
+    public class QuestionWithAnswersVM
+    { 
+        public Questions Question { get; set; }
+        public AnswersMaster AnswersMaster { get; set; }
+        public List<AnswersDetails> AnswersDetails { get; set; }
+        public long? AnswerDetailsId { get; set; } /*selected answer*/
+        public string ActualAnswerText { get; set; }
+        
+    }
+    public class StudentCompetitionQuestionAnswerVM
+    {
+        public List<StudentCompetitionQuestionAnswer> StudentCompetitionQuestionAnswers { get; set; }
+    }
 }

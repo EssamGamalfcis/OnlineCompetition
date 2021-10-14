@@ -13,7 +13,7 @@ using OnlineCompetition.MVC.Enums;
 
 namespace OnlineCompetition.MVC.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class CompetitionsController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -23,18 +23,21 @@ namespace OnlineCompetition.MVC.Controllers
         }
 
         /*cometition setup*/
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Cometition_Index()
         {
             var data = await _db.Competitions.Where(x=>x.IsDeleted != true).OrderByDescending(x=>x.CreationDate).ToListAsync();
             return View(data);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrEditCompetition(long? id)
         {
             var model = id == 0 ? new Competitions() : await _db.Competitions.FirstOrDefaultAsync(x => x.Id == id);
             return PartialView("_AddOrEditCompetition",model);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateCompetition(CompetitionsVM obj)
         {
             try
@@ -90,6 +93,7 @@ namespace OnlineCompetition.MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteCompetition(DeleteVM obj)
         {
             try
@@ -118,12 +122,14 @@ namespace OnlineCompetition.MVC.Controllers
         }
         /*end competition setup*/
         /*qesutions setup*/
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Question_Index()
         {
             var data = await _db.Questions.Where(x => x.IsDeleted != true).OrderByDescending(x => x.CreationDate).ToListAsync();
             return View(data);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrEditQuestions(long? id)
         {
             var model = new Questions();
@@ -134,6 +140,7 @@ namespace OnlineCompetition.MVC.Controllers
             return PartialView("_AddOrEditQuestions", model);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateQuestions(Questions obj)
         {
             try
@@ -177,6 +184,7 @@ namespace OnlineCompetition.MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteQuestion(DeleteVM obj)
         {
             try
@@ -206,6 +214,7 @@ namespace OnlineCompetition.MVC.Controllers
         /*end qesutions Setup*/
 
         /*answer Setup*/
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Answer_Index()
         {
             var data = from AM in _db.AnswersMaster
@@ -221,6 +230,7 @@ namespace OnlineCompetition.MVC.Controllers
             return View(await data.ToListAsync());
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrEditAnswer(long? id)
         {
             var model = new AnsewrsVM();
@@ -242,6 +252,7 @@ namespace OnlineCompetition.MVC.Controllers
             return PartialView("_AddOrEditAnswers", model);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateAnswer(AnsewrsVM obj)
         {
             try
@@ -346,6 +357,7 @@ namespace OnlineCompetition.MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteAnswer(DeleteVM obj)
         {
             try
@@ -377,12 +389,14 @@ namespace OnlineCompetition.MVC.Controllers
         }
         /*end answer Setup*/
         /*start link competition question answers and link competition students*/
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> CompetitionQuestionAnswer_Index()
         {
             var data = await _db.Competitions.Where(x => x.IsDeleted != true).OrderByDescending(x => x.CreationDate).ToListAsync();
             return View(data);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrEditCompetitionQuestionAnswers(long id)
         {
             QuestionVM model = new QuestionVM();
@@ -393,10 +407,12 @@ namespace OnlineCompetition.MVC.Controllers
             return PartialView("_AddOrEditCompetitionQuestionAnswers", model);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<List<AnswersDetails>> GetAnswerDetails(long AnswerMasterId)
         {
             return await _db.AnswersDetails.Where(x => x.AnswerMasterId == AnswerMasterId).ToListAsync();
         }
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateCompetitionQuestionAnswer(CompetitionQuestionAnswerVM obj)
         {
             try
@@ -432,6 +448,7 @@ namespace OnlineCompetition.MVC.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrEditCompetitionStudents(long id)
         {
             CompetitionStudnetsVM model = new CompetitionStudnetsVM();
@@ -444,6 +461,7 @@ namespace OnlineCompetition.MVC.Controllers
                              select US).ToList();
             return PartialView("_AddOrEditCompetitionStudents", model);
         }
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateCompetitionStudent(CompetitionStudentVM obj)
         {
             try
@@ -478,5 +496,100 @@ namespace OnlineCompetition.MVC.Controllers
             }
         }
         /*end link competition question answers and link competition students*/
+
+        /*student competition*/
+        [Authorize(Roles = "Student")]
+        public async Task<ActionResult> CometitionStudnet_Index()
+        {
+            List<CompetitionStudentToSolveVM> data = new List<CompetitionStudentToSolveVM>();
+            string userId =  _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).Id;
+            List<long> competitionAuthorizeToSee = await _db.CompetitionsUsers.Where(x => x.StudentUserId == userId).Select(x=>x.CompetitionId).ToListAsync();
+            data = (
+                    from COM in _db.Competitions
+                    join COMUS in _db.CompetitionsUsers on COM.Id equals COMUS.CompetitionId
+                    where COM.IsDeleted != true && COM.IsActive == true && competitionAuthorizeToSee.Contains(COM.Id) && COMUS.StudentUserId == userId
+                    select new CompetitionStudentToSolveVM { 
+                    Competitions = COM,
+                    CompetitionsUsers = COMUS,
+                    ActualScore = COMUS.Score
+                    }).ToList();
+            var modelToSend = new List<CompetitionStudentToSolveVM>();
+            foreach (var item in data)
+            {
+                CompetitionStudentToSolveVM newObj = new CompetitionStudentToSolveVM();
+                newObj.Competitions = item.Competitions;
+                newObj.CompetitionsUsers = item.CompetitionsUsers;
+                newObj.ActualScore = item.TotalScore;
+                var questionsId = await _db.CompetitionQuestionsAnswers.Where(x => x.CompetitionsId == item.Competitions.Id).Select(x=>x.QuestionId).ToListAsync();
+                newObj.TotalScore =  _db.Questions.Where(x => questionsId.Contains(x.Id)).Select(x => x.TotalScore).ToList().Sum();
+                newObj.SolvedBefore = _db.CompetitionsUsers.FirstOrDefault(x => x.CompetitionId == item.Competitions.Id && x.StudentUserId == userId).SolvedBefore;
+                modelToSend.Add(newObj);
+            }
+            ViewBag.CompetitionStudnet = await _db.CompetitionsUsers.Where(x => competitionAuthorizeToSee.Contains(x.Id)).ToListAsync();
+
+            return View(modelToSend);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Student")]
+        public async Task<ActionResult> StartCompetition(long compeitionId)
+        {
+            CompetitionQuestionsForStudentVM model = new CompetitionQuestionsForStudentVM();
+            string userId = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).Id;
+            model.Competitions = await _db.Competitions.FirstOrDefaultAsync(x => x.Id == compeitionId);
+            List<CompetitionQuestionsAnswers> compQuestionsAnswers = await _db.CompetitionQuestionsAnswers.Where(x => x.CompetitionsId == compeitionId).ToListAsync();
+            List<long> compQuestions = compQuestionsAnswers.Select(x => x.QuestionId).ToList();
+            model.Questions = (
+                                from QUE in _db.Questions
+                                join COMQUE in _db.CompetitionQuestionsAnswers on QUE.Id equals COMQUE.QuestionId
+                                where COMQUE.CompetitionsId == compeitionId
+                                select new QuestionWithAnswersVM
+                                { 
+                                    Question = QUE,
+                                    AnswersMaster = _db.AnswersMaster.FirstOrDefault(x=>x.Id == COMQUE.AnswersMasterId),
+                                    AnswersDetails = _db.AnswersDetails.Where(x=>x.AnswerMasterId == COMQUE.AnswersMasterId).ToList(),
+                                    ActualAnswerText = "",
+                                    AnswerDetailsId = null,
+                                }).ToList();
+            return PartialView("_StudentCompetition", model);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Student")]
+        public async Task<ActionResult> SubmitStudentAnswers(StudentCompetitionQuestionAnswerVM obj)
+        {
+            try
+            {
+                string userId = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).Id;
+                foreach (var StudentCompetitionQuestionAnswer in obj.StudentCompetitionQuestionAnswers)
+                {
+                    var newStudentCompetitionQuestionAnswer = new StudentCompetitionQuestionAnswer();
+                    newStudentCompetitionQuestionAnswer = StudentCompetitionQuestionAnswer;
+                    newStudentCompetitionQuestionAnswer.RightAnswersDetailsId = _db.CompetitionQuestionsAnswers.FirstOrDefault(x => x.CompetitionsId == StudentCompetitionQuestionAnswer.CompetitionId && x.QuestionId == StudentCompetitionQuestionAnswer.QuestionsId).AnswersDetailsId;
+                    await _db.StudentCompetitionQuestionAnswer.AddAsync(newStudentCompetitionQuestionAnswer);
+                    await _db.SaveChangesAsync();
+                }
+                var competitionUser = _db.CompetitionsUsers.FirstOrDefault(x => x.StudentUserId == userId && x.CompetitionId == obj.StudentCompetitionQuestionAnswers[0].CompetitionId);
+                competitionUser.SolvedBefore = true;
+                await _db.SaveChangesAsync();
+                var retObj = new Response
+                {
+                    ArabicMsg = "تم الحفظ بنجاح",
+                    EnglishMsg = "Saved Successfully",
+                    Success = true
+                };
+                return Ok(retObj);
+            }
+            catch (Exception e)
+            {
+                var retObj = new Response
+                {
+                    ArabicMsg = "خطأ بالسيرفر",
+                    EnglishMsg = "Server Error",
+                    Success = false
+                };
+                return Ok(retObj);
+            }
+        }
+        /*end student competition*/
     }
 }

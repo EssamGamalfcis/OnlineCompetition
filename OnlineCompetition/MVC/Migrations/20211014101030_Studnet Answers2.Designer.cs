@@ -4,14 +4,16 @@ using AdminPanel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace OnlineCompetition.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211014101030_Studnet Answers2")]
+    partial class StudnetAnswers2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -572,22 +574,22 @@ namespace OnlineCompetition.MVC.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("ActualAnswersDetailId")
+                    b.Property<long?>("AnswersDetailId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ActualAnswersText")
+                    b.Property<long>("AnswersDetailsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AnswersMasterId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AnswersText")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("AnswersMasterId")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("CompetitionId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("QuestionsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("RightAnswersDetailsId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("StudentUserId")
@@ -738,9 +740,7 @@ namespace OnlineCompetition.MVC.Migrations
                 {
                     b.HasOne("OnlineCompetition.Models.AnswersMaster", "AnswersMaster")
                         .WithMany()
-                        .HasForeignKey("AnswersMasterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AnswersMasterId");
 
                     b.HasOne("OnlineCompetition.Models.Competitions", "Competition")
                         .WithMany()
