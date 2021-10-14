@@ -32,7 +32,7 @@
             <td>@Question.TotalScore</td>
             <td style="text-align:center">
                 <a class="btn btn-danger" style="cursor: pointer; color: white;" questionId="@Question.Id" onclick="Delete(this)">Delete</a>
-                <a class="btn btn-primary" style="cursor: pointer; color: white;" questionId="@Question.Id" id="editQuestions">Update</a>
+                <a class="btn btn-primary editQuestions" style="cursor: pointer; color: white;" questionId="@Question.Id">Update</a>
             </td>
         </tr> 
          }
@@ -50,7 +50,7 @@
                         $('#addQuestionModal').modal('show');
                     });
                 });
-                $('#editQuestions').click(function () {
+                $('.editQuestions').click(function () {
                     var url = $('#addQuestionModal').data('url');
                     url = url.replace('0', $(this).attr('questionId'))
                     $.get(url, function (data) {

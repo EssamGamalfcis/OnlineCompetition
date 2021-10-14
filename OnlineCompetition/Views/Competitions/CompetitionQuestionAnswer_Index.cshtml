@@ -1,0 +1,89 @@
+﻿@using AdminPanel.Models
+@model List<OnlineCompetition.Models.Competitions>
+@{ ViewData["Title"] = "Cometition Index";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<link href="~/css/fontawesome.css" rel="stylesheet" />
+<script src="~/js/sweetalert2.js"></script>
+
+<h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">ربط المسابقات بالاسألة والطلاب</h1>
+
+<div id='addCompetitionQuestionAnswerModal' class='modal fade' data-url='@Url.Action("AddOrEditCompetitionQuestionAnswers")?id=0'>
+    <div id='addCompetitionQuestionAnswerContainer' class="container partialViewModal">
+    </div>
+</div>
+
+<div id='addCompetitionStudentsModal' class='modal fade' data-url='@Url.Action("AddOrEditCompetitionStudents")?id=0'>
+    <div id='addCompetitionStudentsContainer' class="container partialViewModal">
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>أسم المسابقة</th>
+            <th>تاريخ الانشاء</th>
+            <th>المدة</th>
+            <th>نشط</th>
+            <th style="text-align:center">اضافة طلاب للمسابقة / اضافة اسألة للمسابقة</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var OnlineCompetition in Model)
+        {
+<tr>
+    <td>@OnlineCompetition.NameAR</td>
+    <td>@OnlineCompetition.CreationDate.ToString("yyyy/dd/mm")</td>
+    <td>@OnlineCompetition.Duration</td>
+    @{
+    if(OnlineCompetition.IsActive == true)
+    {
+    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10004;</span></td>
+    }
+    else
+    {
+    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10008;</span></td>
+    }
+    }
+    <td style="text-align:center">
+        <a class="btn btn-primary addLinkCompetitionQuestionAnswer" style="cursor: pointer; color: white; margin-right: 15;" competitionId="@OnlineCompetition.Id" >Link Questions</a>
+        <a class="btn btn-info addLinkCompetitionStudents" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" >Link Students</a>
+    </td>
+</tr> }
+            </tbody>
+        </table>
+<script>$(document).ready(function () {
+                $('.addLinkCompetitionQuestionAnswer').click(function () {
+                    var url = $('#addCompetitionQuestionAnswerModal').data('url');
+                    url = url.replace('0', $(this).attr('competitionid'))
+                    $.get(url, function (data) {
+                        $('#addCompetitionQuestionAnswerContainer').html(data);
+                        $("#addCompetitionQuestionAnswerModal").addClass("in");
+                        $(".modal-backdrop").show()
+                        $("#addCompetitionQuestionAnswerModal").show();
+                        $('#addCompetitionQuestionAnswerModal').modal('show');
+                    });
+                });
+                 $('.addLinkCompetitionStudents').click(function () {
+                     var url = $('#addCompetitionStudentsModal').data('url');
+                    url = url.replace('0', $(this).attr('competitionid'))
+                    $.get(url, function (data) {
+                        $('#addCompetitionStudentsContainer').html(data);
+                        $("#addCompetitionStudentsModal").addClass("in");
+                        $(".modal-backdrop").show()
+                        $("#addCompetitionStudentsModal").show();
+                        $('#addCompetitionStudentsModal').modal('show');
+                    });
+                });
+            });
+            function Cancel() {
+                $("#addCompetitionQuestionAnswerModal").removeClass("in");
+                $(".modal-backdrop").hide()
+                $("#addCompetitionQuestionAnswerModal").hide();
+            }
+            function Cancel2() {
+                $("#addCompetitionStudentsModal").removeClass("in");
+                $(".modal-backdrop").hide()
+                $("#addCompetitionStudentsModal").hide();
+            }
+    </script>

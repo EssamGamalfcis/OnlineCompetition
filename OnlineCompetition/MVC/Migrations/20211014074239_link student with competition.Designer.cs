@@ -4,14 +4,16 @@ using AdminPanel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace OnlineCompetition.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211014074239_link student with competition")]
+    partial class linkstudentwithcompetition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -361,12 +363,17 @@ namespace OnlineCompetition.MVC.Migrations
                     b.Property<bool?>("SolvedBefore")
                         .HasColumnType("bit");
 
-                    b.Property<string>("StudentUserId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StudentUserId1")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CompetitionId");
+
+                    b.HasIndex("StudentUserId1");
 
                     b.ToTable("CompetitionsUsers");
                 });
@@ -653,6 +660,10 @@ namespace OnlineCompetition.MVC.Migrations
                         .HasForeignKey("CompetitionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("AdminPanel.Models.ApplicationUser", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId1");
                 });
 
             modelBuilder.Entity("OnlineCompetition.Models.QuestionnaireAnswers", b =>

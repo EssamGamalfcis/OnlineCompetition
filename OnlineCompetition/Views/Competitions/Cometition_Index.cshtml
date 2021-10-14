@@ -43,7 +43,7 @@
     }
     <td style="text-align:center">
         <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" onclick="Delete(this)">Delete</a>
-        <a class="btn btn-primary" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" id="editCompetition">Update</a>
+        <a class="btn btn-primary editCompetition" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id">Update</a>
     </td>
 </tr> }
             </tbody>
@@ -60,7 +60,7 @@
                         $('#addCompetitionModal').modal('show');
                     });
                 });
-                $('#editCompetition').click(function () {
+                $('.editCompetition').click(function () {
                     var url = $('#addCompetitionModal').data('url');
                     url = url.replace('0', $(this).attr('competitionid'))
                     $.get(url, function (data) {

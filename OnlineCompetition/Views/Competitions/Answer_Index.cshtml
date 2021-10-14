@@ -26,14 +26,27 @@
     <tbody>
         @foreach (var Answer in Model)
         {
-            string answers = string.Join("&#13;", Answer.AnswersMaster);
+            string answers = string.Join("\n", Answer.AnswersDetails.Select(x=>x.AnswerText));
+            string answerTypeAr = "";
+            if (Answer.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse)
+            {
+                answerTypeAr = "صح وخطأ";
+            }
+            else if (Answer.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
+            {
+                answerTypeAr = "مقالى";
+            }
+            else
+            {
+                answerTypeAr = "أختيارات";
+            }
              <tr>
                   <td>@Answer.AnswersMaster.NameAR</td>
-                  <td>@Answer.AnswersMaster.AnswerType.ToString()</td>
-                  <td title="answers">Hover Here</td>
+                  <td>@answerTypeAr</td>
+                  <td title="@answers" style="cursor:pointer">Hove here</td>
                   <td style="text-align:center">
                      <a class="btn btn-danger" style="cursor: pointer; color: white;" answerMasterId="@Answer.AnswersMaster.Id" onclick="Delete(this)">Delete</a>
-                     <a class="btn btn-primary" style="cursor: pointer; color: white;" answerMasterId="@Answer.AnswersMaster.Id" id="editAnswer">Update</a>
+                     <a class="btn btn-primary editAnswer" style="cursor: pointer; color: white;" answerMasterId="@Answer.AnswersMaster.Id" >Update</a>
                   </td>
              </tr>
         }
@@ -51,7 +64,8 @@
                         $('#addAnswerModal').modal('show');
                     });
                 });
-                $('#editCompetition').click(function () {
+                $('.editAnswer').click(function () {
+                    debugger;
                     var url = $('#addAnswerModal').data('url');
                     url = url.replace('0', $(this).attr('answerMasterId'))
                     $.get(url, function (data) {
@@ -83,7 +97,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "POST",
-                            url: "@Url.Action("DeleteCompetition")",
+                            url: "@Url.Action("DeleteAnswer")",
                             data: { obj: objToSend },
                             dataType: "text",
                             success: function (response) {

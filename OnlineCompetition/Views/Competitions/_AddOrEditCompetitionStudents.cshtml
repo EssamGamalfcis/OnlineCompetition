@@ -1,0 +1,107 @@
+﻿@using OnlineCompetition.Models;  
+@model CompetitionStudnetsVM
+    <div class="form-row">
+        <div class="col align-content-center" style="margin-left: 45%; margin-top: 15px; margin-bottom: 15px;">
+            <h3>@Model.Competion.NameAR</h3>
+        </div>
+    </div>
+    @{ 
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th style="text-align: initial;">أضافة</th>
+                    <th style="text-align: center;">اسم الطالب</th>
+                    <th style="text-align: center;">البريد الالكترونى للطالب</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Student in Model.Students)
+                {
+                    string studentFullName = Student.FirstName + " " + Student.LastName;
+                    string checkedOrNot = "";
+                    if ((ViewBag.SelectedCompetitionUsers as ICollection<CompetitionsUsers>).Any(x => x.StudentUserId == Student.Id) == true)
+                    {
+                        checkedOrNot = "checked";
+                    }
+                <tr>
+                    <td style="width:30px"><input type="checkbox" competitionId="@Model.Competion.Id" studentUserId="@Student.Id" @checkedOrNot class="form-control CheckBox"></td>
+                    <td style="text-align: center;">@studentFullName</td>
+                    <td style="text-align: center;">@Student.Email</td>
+                </tr>
+                    
+                 }
+            </tbody>
+        </table>
+    }
+
+    <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
+        <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
+            <div class="spinner-border" id="Loader" role="status" style="display:none !important">
+            </div>
+        </div>
+
+        <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="LinkCompetitionStudents()" value="حفظ" />
+        <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel2()" value="إلغاء" />
+    </div>
+    <script>
+        function LinkCompetitionStudents() {
+            debugger;
+            var CompetitionStudnets = [];
+            $('.CheckBox').each(function () {
+                if (this.checked) {
+                    var CompetitionStudnet = {};
+                    CompetitionStudnet.CompetitionId = $(this).attr('competitionId');
+                    CompetitionStudnet.StudentUserId = $(this).attr('studentUserId');
+                    CompetitionStudnets.push(CompetitionStudnet);
+                }
+            });
+            if (CompetitionStudnets.length < 1) {
+                Swal.fire(
+                    'خطأ',
+                    'برجاء أختيار طالب واحد على الاقل',
+                    'error'
+                );
+                return 0;
+            }
+           $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddOrUpdateCompetitionStudent")",
+               data: { CompetitionStudnets: CompetitionStudnets},
+            dataType: "text",
+            success: function (response) {
+                if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
+                    Swal.fire(
+                        'جيد',
+                        'تم الحفظ بنجاح',
+                        'success'
+                    ).then((result) => {
+                        Cancel();
+                        location.reload();
+                    })
+
+                }
+                else {
+                    Swal.fire(
+                        'تنبية',
+                        $.parseJSON(response).arabicMsg,
+                        'warning'
+                    );
+                    $('#Loader').hide();
+                    $('#SaveBtn').show();
+                    $('#CancelBtn').show();
+                }
+            },
+            error: function (req, status, error) {
+                Swal.fire(
+                    'تنبية',
+                    'خطأ بالسيرفر',
+                    'warning'
+                );
+                $('#Loader').hide();
+                $('#SaveBtn').show();
+                $('#CancelBtn').show();
+            }
+        });
+        }
+
+    </script>

@@ -27,17 +27,16 @@
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">أعدادات المسابقات</a>
+                                <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">المسابقة</a>
                                 <div class="dropdown-menu" aria-labelledby="navdrop2" style="text-align: justify;">
                                     <a class="dropdown-item"  asp-controller="Competitions" asp-action="Cometition_Index">تعريف المسابقات</a>
                                     <a class="dropdown-item"  asp-controller="Competitions" asp-action="Question_Index">تعريف الاسألة</a>
                                     <a class="dropdown-item"  asp-controller="Competitions" asp-action="Answer_Index">تعريف الاجابات </a>
-                                    <a class="dropdown-item">ربط الاسألة بالاجابات </a>
-                                    <a class="dropdown-item">ربط المستخدمين بالمسابقات</a>
+                                    <a class="dropdown-item" asp-controller="Competitions" asp-action="CompetitionQuestionAnswer_Index">أعداد المسابقات </a>
                                 </div>
                             </li>
                              <li class="nav-item dropdown">
-                                 <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">أعدادات الأستبيان</a>
+                                 <a class="nav-link dropdown-toggle" id="navdrop2" role="button" data-toggle="dropdown" data-hover="dropdown">الأستبيان</a>
                                  <div class="dropdown-menu" aria-labelledby="navdrop2" style="text-align: justify;">
                                      <a class="dropdown-item">أضافة استبيان جديد</a>
                                      <a class="dropdown-item">اضافة الأصناف للأستبيان</a>

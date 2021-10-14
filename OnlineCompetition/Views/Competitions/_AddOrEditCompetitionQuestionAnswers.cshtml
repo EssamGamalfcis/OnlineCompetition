@@ -1,0 +1,155 @@
+﻿@using OnlineCompetition.Models;  
+@model QuestionVM
+    <div class="form-row">
+        <div class="col align-content-center" style="margin-left: 45%; margin-top: 15px; margin-bottom: 15px;">
+            <h3>@Model.Competion.NameAR</h3>
+        </div>
+    </div>
+    @{ 
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th style="text-align: initial;">أضافة</th>
+                    <th style="text-align: center;">السؤال</th>
+                    <th style="text-align: center;">الاجابات</th>
+                    <th style="text-align: center;">الاجابة الصحيحة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Question in Model.Questions)
+                {
+                    string checkedOrNot = "";
+                    if ((ViewBag.SelectedCompetitionQuestionsAnswers as ICollection<CompetitionQuestionsAnswers>).Any(x => x.QuestionId == Question.Id) == true)
+                    {
+                        checkedOrNot = "checked";
+                    }
+                <tr>
+                    <td style="width:30px"><input  type="checkbox" competitionId="@Model.Competion.Id"  questionId="@Question.Id" answerMasterId="answerMasterId_@Question.Id" answerDetailId="answerDetailId_@Question.Id" @checkedOrNot class="form-control CheckBox"></td>
+                    <td style="text-align: center;">@Question.NameAR</td>
+                    <td style="text-align: center;">
+                        <select class="form-control AnswerDetails" answerDetailTd="answerDetailTd_@Question.Id" answerDetailId="answerDetailId_@Question.Id" id="answerMasterId_@Question.Id"  questionId="@Question.Id" onchange="GetAnswerDetails(this)">
+                            @{
+                                foreach (var Answers in Model.AnswersMaster)
+                                {
+                                    if ((ViewBag.SelectedCompetitionQuestionsAnswers as ICollection<CompetitionQuestionsAnswers>).Any(x => x.QuestionId == Question.Id && x.AnswersMasterId == Answers.Id) == true)
+                                    {
+                                        <option value="@Answers.Id"  selected>@Answers.NameAR</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@Answers.Id">@Answers.NameAR</option>
+                                     }
+                                }
+                              }
+                        </select>
+                    </td>
+                    <td id="answerDetailTd_@Question.Id" style="display: none; text-align: center;"><select id="answerDetailId_@Question.Id" class="form-control"></select></td>
+                    </tr>
+                    
+                    }
+            </tbody>
+        </table>
+    }
+
+    <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
+        <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
+            <div class="spinner-border" id="Loader" role="status" style="display:none !important">
+            </div>
+        </div>
+
+        <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="LinkCompetitionQuestionAnswer()" value="حفظ" />
+        <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
+    </div>
+    <script>
+        $('.AnswerDetails').each(function (i, obj) {
+            GetAnswerDetails(obj, $(obj).attr('answerDetailTd'), $(obj).attr('answerDetailId'), $(obj).attr('questionId'))
+        });
+        function GetAnswerDetails(obj, answerDetailsTd, answerDetailsDropdown, questionId) {
+            debugger;
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetAnswerDetails")?AnswerMasterId="+$(obj).val(),
+            success: function (data) {
+                var competitionAnswerDetails = JSON.parse('@Html.Raw(Json.Serialize(ViewBag.SelectedCompetitionQuestionsAnswers))');
+                $("#" + $(obj).attr('answerDetailId')).html('');
+                $("#" + $(obj).attr('answerDetailTd')).show();
+                var selectedOrNot = '';
+                if (competitionAnswerDetails.filter(x => x.answersMasterId == $(obj).val() && x.answersDetailsId == data[0].id && x.questionId == questionId).length > 0) {
+                    selectedOrNot = 'selected';
+                }
+                var option = '<option value="' + data[0].id + '"' + selectedOrNot + '>' + data[0].answerText + '</option>';
+                $("#" + $(obj).attr('answerDetailId')).append(option);
+                for (var i = 1; i < data.length; i++) {
+                    selectedOrNot = '';
+                    if (competitionAnswerDetails.filter(x => x.answersMasterId == $(obj).val() && x.answersDetailsId == data[i].id && x.questionId == questionId).length > 0) {
+                        selectedOrNot = 'selected';
+                    }
+                    var option = '<option value="' + data[i].id + '"' + selectedOrNot + '>' + data[i].answerText + '</option>';
+                    $("#" + $(obj).attr('answerDetailId')).append(option);
+                }
+            }
+        });
+        }
+        function LinkCompetitionQuestionAnswer() {
+            var CompetitionQuestionAnswers = [];
+            $('.CheckBox').each(function () {
+                if (this.checked) {
+                    debugger;
+                    var CompetitionQuestionAnswer = {};
+                    CompetitionQuestionAnswer.CompetitionsId = $(this).attr('competitionId');
+                    CompetitionQuestionAnswer.QuestionId = $(this).attr('questionId');
+                    CompetitionQuestionAnswer.AnswersMasterId = $('#' + $(this).attr('answerMasterId')).val();
+                    CompetitionQuestionAnswer.AnswersDetailsId = $('#' + $(this).attr('answerDetailId')).val();
+                    CompetitionQuestionAnswers.push(CompetitionQuestionAnswer);
+                }
+            });
+            if (CompetitionQuestionAnswers.length < 1) {
+                Swal.fire(
+                    'خطأ',
+                    'برجاء أختيار سؤال واحد على الاقل',
+                    'error'
+                );
+                return 0;
+            }
+           $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddOrUpdateCompetitionQuestionAnswer")",
+               data: { CompetitionQuestionsAnswers: CompetitionQuestionAnswers},
+            dataType: "text",
+            success: function (response) {
+                if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
+                    Swal.fire(
+                        'جيد',
+                        'تم الحفظ بنجاح',
+                        'success'
+                    ).then((result) => {
+                        Cancel();
+                        location.reload();
+                    })
+
+                }
+                else {
+                    Swal.fire(
+                        'تنبية',
+                        $.parseJSON(response).arabicMsg,
+                        'warning'
+                    );
+                    $('#Loader').hide();
+                    $('#SaveBtn').show();
+                    $('#CancelBtn').show();
+                }
+            },
+            error: function (req, status, error) {
+                Swal.fire(
+                    'تنبية',
+                    'خطأ بالسيرفر',
+                    'warning'
+                );
+                $('#Loader').hide();
+                $('#SaveBtn').show();
+                $('#CancelBtn').show();
+            }
+        });
+        }
+
+    </script>

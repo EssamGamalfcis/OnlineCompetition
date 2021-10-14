@@ -1,6 +1,24 @@
 ﻿@model AnsewrsVM
 @{
     int answerType = (int)Model.AnswersMaster.AnswerType;
+    string answer1 = "";
+    string answer2 = "";
+    string answer3 = "";
+    string answer4 = "";
+    string answer5 = "";
+    for (int i = 0; i < Model.AnswersDetails.Count(); i++)
+    {
+        if (i == 0)
+            answer1 = Model.AnswersDetails[i].AnswerText;
+        if (i == 1)
+            answer2 = Model.AnswersDetails[i].AnswerText;
+        if (i == 2)
+            answer3 = Model.AnswersDetails[i].AnswerText;
+        if (i == 3)
+            answer4 = Model.AnswersDetails[i].AnswerText;
+        if (i == 4)
+            answer5 = Model.AnswersDetails[i].AnswerText;
+    }
  }
        <div class="form-row">
            <div class="col">
@@ -27,11 +45,11 @@
        </div>
        <div class="form-row" id="multiAnswers" style="display:none">
            <div class="col">
-               <input class="form-control form-control-sm" type="text" style="margin-top: 10px;" placeholder="الاجابة الاولى">
-               <input class="form-control form-control-sm" type="text" style="margin-top: 10px;" placeholder="الاجابة الثانية">
-               <input class="form-control form-control-sm" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الثالثة" id="multiAnswers3">
-               <input class="form-control form-control-sm" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الرابعة" id="multiAnswers4">
-               <input class="form-control form-control-sm" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الخامسة" id="multiAnswers5">
+               <input class="form-control form-control-sm" value="@answer1" type="text" style="margin-top: 10px;" placeholder="الاجابة الاولى">
+               <input class="form-control form-control-sm" value="@answer2" type="text" style="margin-top: 10px;" placeholder="الاجابة الثانية">
+               <input class="form-control form-control-sm" value="@answer3" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الثالثة" id="multiAnswers3">
+               <input class="form-control form-control-sm" value="@answer4" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الرابعة" id="multiAnswers4">
+               <input class="form-control form-control-sm" value="@answer5" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الخامسة" id="multiAnswers5">
            </div>
        </div>
         <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
@@ -42,7 +60,7 @@
             <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="AnswerSaveChange()" value="حفظ" />
             <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
         </div>
-<script>
+        <script>
 
     var answerMasterId = '@Model.AnswersMaster.Id';
     if (answerMasterId != '0') {
@@ -53,7 +71,6 @@
     }
 
     function ShowAndHideChoices() {
-        debugger;
         if ($('#AnswerType').val() == 1) {
             $('#AnswersNumberDiv').show();
             $('#multiAnswers').show();
@@ -86,18 +103,29 @@
         }
     }
     function AnswerSaveChange() {
-
+        var validDetails = true;
         $('#Loader').show();
         $('#SaveBtn').hide();
         $('#CancelBtn').hide();
-        var objToSend = {};
-        objToSend.Id = '@Model.AnswersMaster.Id';
-        objToSend.NameAR = $('#QuestionNameAr').val();
-        objToSend.NameEN = $('#QuestionNameAr').val();
-        objToSend.Sort = $('#QuestionSort').val();
-        objToSend.TotalScore = $('#QuestionTotalScore').val();
-        if (objToSend.Duration > 1000 || objToSend.Duration <= 0 ||
-            objToSend.NameAR == '' || objToSend.NameEN == '')
+        var answerMaster = {};
+        var answerDetails = [];
+        answerMaster.Id = '@Model.AnswersMaster.Id';
+        answerMaster.NameAR = $('#AnswerName').val();
+        answerMaster.NameEN = $('#AnswerName').val();
+        answerMaster.AnswerType = $('#AnswerType').val();
+        if ($('#AnswerType').val() == 1) {
+            $('.form-control-sm').each(function (i, obj) {
+                if ($(obj).is(":visible")) {
+                    var answerDetail = {};
+                    answerDetail.AnswerText = $(obj).val();
+                    answerDetails.push(answerDetail);
+                    if ($(obj).val().trim() == '') {
+                        validDetails = false;
+                    }
+                }
+            });
+        }
+        if ($('#AnswerName').val().trim() == '' || validDetails == '')
         {
             Swal.fire(
                 'تنبية',
@@ -109,11 +137,10 @@
             $('#CancelBtn').show();
             return 0;
         }
-
         $.ajax({
             type: "POST",
-            url: "@Url.Action("AddOrUpdateQuestions")",
-            data: { obj: objToSend},
+            url: "@Url.Action("AddOrUpdateAnswer")",
+            data: { AnswersMaster: answerMaster, AnswersDetails: answerDetails},
             dataType: "text",
             success: function (response) {
                 if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
@@ -130,7 +157,7 @@
                 else {
                     Swal.fire(
                         'تنبية',
-                        'برجاء المحاولة فى وقت أخر',
+                        $.parseJSON(response).arabicMsg,
                         'warning'
                     );
                     $('#Loader').hide();

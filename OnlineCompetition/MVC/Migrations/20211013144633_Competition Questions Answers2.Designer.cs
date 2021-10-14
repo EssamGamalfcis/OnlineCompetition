@@ -4,14 +4,16 @@ using AdminPanel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace OnlineCompetition.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211013144633_Competition Questions Answers2")]
+    partial class CompetitionQuestionsAnswers2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -355,18 +357,20 @@ namespace OnlineCompetition.MVC.Migrations
                     b.Property<long>("CompetitionId")
                         .HasColumnType("bigint");
 
-                    b.Property<float?>("Score")
+                    b.Property<float>("Score")
                         .HasColumnType("real");
 
-                    b.Property<bool?>("SolvedBefore")
+                    b.Property<bool>("SolvedBefore")
                         .HasColumnType("bit");
 
                     b.Property<string>("StudentUserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CompetitionId");
+
+                    b.HasIndex("StudentUserId");
 
                     b.ToTable("CompetitionsUsers");
                 });
@@ -653,6 +657,10 @@ namespace OnlineCompetition.MVC.Migrations
                         .HasForeignKey("CompetitionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("AdminPanel.Models.ApplicationUser", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId");
                 });
 
             modelBuilder.Entity("OnlineCompetition.Models.QuestionnaireAnswers", b =>

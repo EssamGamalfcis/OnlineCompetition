@@ -55,4 +55,23 @@ namespace AdminPanel.Models
         public AnswersMaster AnswersMaster { get; set; }
         public List<AnswersDetails> AnswersDetails { get; set; }
     }
+    public class QuestionVM
+    {
+       public Competitions Competion { get; set; }
+        public List<Questions> Questions { get; set; }
+        public List<AnswersMaster> AnswersMaster { get; set; }
+    }
+    public class CompetitionQuestionAnswerVM
+    {
+        public List<CompetitionQuestionsAnswers> CompetitionQuestionsAnswers { get; set; }
+    }
+    public class CompetitionStudnetsVM
+    {
+        public List<ApplicationUser> Students { get; set; }
+        public Competitions Competion { get; set; }
+    }
+    public class CompetitionStudentVM
+    {
+        public List<CompetitionsUsers> CompetitionStudnets { get; set; }
+    }
 }
