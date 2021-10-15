@@ -27,29 +27,30 @@
     <tbody>
         @foreach (var item in Model)
         {
-<tr>
-    <td>@item.Competitions.NameAR</td>
-    <td>@item.Competitions.CreationDate.ToString("MM/dd/yyyy")</td>
-    <td>@item.Competitions.Duration</td>
-    <td>@item.TotalScore</td>
-    <td>@item.ActualScore</td>
-    @{ 
-        if (item.SolvedBefore == true)
-        {
-        <td style="text-align:center" title="تم الحل مسبقا">
-            <a class="btn btn-primary disabled startCompetition" style="cursor: pointer; color: white;" competitionId="@item.Competitions.Id">Start</a>
-        </td>
-        }
-        else
-        { 
-        <td style="text-align:center">
-            <a class="btn btn-primary startCompetition" style="cursor: pointer; color: white;" competitionId="@item.Competitions.Id">Start</a>
-        </td>
-        }
-    }
-
-</tr>
-}
+            string studnetScore = item.ActualScore == null ? "لم يتم التصحيح بعد" : item.ActualScore.ToString();
+            <tr>
+                <td>@item.Competitions.NameAR</td>
+                <td>@item.Competitions.CreationDate.ToString("MM/dd/yyyy")</td>
+                <td>@item.Competitions.Duration</td>
+                <td>@item.TotalScore</td>
+                <td>@studnetScore</td>
+                @{ 
+                    if (item.SolvedBefore == true)
+                    {
+                    <td style="text-align:center" title="تم الحل مسبقا">
+                        <a class="btn btn-primary disabled startCompetition" style="cursor: pointer; color: white;" competitionId="@item.Competitions.Id">Start</a>
+                    </td>
+                    }
+                    else
+                    { 
+                    <td style="text-align:center">
+                        <a class="btn btn-primary startCompetition" style="cursor: pointer; color: white;" competitionId="@item.Competitions.Id">Start</a>
+                    </td>
+                    }
+                }
+            
+            </tr>
+            }
     </tbody>
 </table>
 <script>

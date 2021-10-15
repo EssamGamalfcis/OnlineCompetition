@@ -1,0 +1,131 @@
+﻿@using OnlineCompetition.Models;
+@model List<CorrectorVM>
+<div class="form-row">
+    <div class="col align-content-center" style="margin-left: 45%; margin-top: 15px; margin-bottom: 15px;">
+        <h3>@Model[0].CompetitionName</h3>
+    </div>
+</div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style=" text-align: center;">السؤال</th>
+                <th style=" text-align: center;">الاجابة الصحيحة</th>
+                <th style=" text-align: center;">أجابة الطالب</th>
+                <th style=" text-align: center;">درجة السؤال</th>
+                <th style=" text-align: center;">درجة الطالب</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                string studnetAnswerText = item.ActualAnswerDetailId == null ? item.ActualFreeTextAnswer : item.ActualAnswerDetailText;
+                float? studentScore = 0;
+                if (item.StudentScore == null)
+                {
+                    studentScore = item.AnswerDetailId == item.ActualAnswerDetailId && item.ActualAnswerDetailText != "مقالى" ? item.QuestionScore : 0;
+                    studentScore = item.ActualAnswerDetailText == "مقالى" ? null : studentScore;
+                }
+                else
+                {
+                    studentScore = item.StudentScore;
+                }
+                <tr>
+                    <td style=" text-align: center;">@item.QuestionName</td>
+                    <td style=" text-align: center;">@item.AnswerDetailText</td>
+                    <td style=" text-align: center;">@studnetAnswerText</td>
+                    <td style=" text-align: center;">@item.QuestionScore</td>
+                    <td><input min="0" max="@item.QuestionScore" class="form-control" STANId="@item.Id" style=" width: 50%; margin-right: 20%;" type="number" value="@studentScore" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
+        <div class="d-flex justify-content-center" style="margin-right: 10%; margin-top: 1%;">
+            <div class="spinner-border" id="Loader" role="status" style="display:none !important">
+            </div>
+        </div>
+        <input type="button" id="SaveBtn" style=" margin-left: 25px; margin-right: -49px;" class="btn btn-info" onclick="CorrectStudentAnswer()" value="حفظ" />
+        <input type="button" id="CancelBtn" class="btn btn-danger" onclick="Cancel()" value="إلغاء" />
+    </div>
+    <script>
+
+        function CorrectStudentAnswer() {
+            var objToSend = [];
+            var isValid = true;
+            $('.form-control').each(function () {
+                    var obj = {};
+                    obj.Id = $(this).attr('STANId');
+                    obj.StudentScore = $(this).val();
+                objToSend.push(obj);
+                debugger;
+                if (parseInt($(this).val()) > parseInt($(this)[0].max) || parseInt($(this).val()) < parseInt($(this)[0].min)) {
+                    isValid = false;
+                    Swal.fire(
+                        'تنبية',
+                        'خطأ بالدرجات',
+                        'warning'
+                    );
+                }
+                    
+            });
+            if (isValid == false) { return 0 }
+           $.ajax({
+            type: "POST",
+            url: "@Url.Action("SubmitStudentScore")",
+            data: { Data: objToSend},
+            dataType: "text",
+            success: function (response) {
+                if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {
+                    Swal.fire(
+                        'جيد',
+                        'تم الحفظ بنجاح',
+                        'success'
+                    ).then((result) => {
+                        Cancel();
+                        location.reload();
+                    })
+
+                }
+                else {
+                    Swal.fire(
+                        'تنبية',
+                        $.parseJSON(response).arabicMsg,
+                        'warning'
+                    );
+                    $('#Loader').hide();
+                    $('#SaveBtn').show();
+                    $('#CancelBtn').show();
+                }
+            },
+            error: function (req, status, error) {
+                Swal.fire(
+                    'تنبية',
+                    'خطأ بالسيرفر',
+                    'warning'
+                );
+                $('#Loader').hide();
+                $('#SaveBtn').show();
+                $('#CancelBtn').show();
+            }
+        });
+        }
+        function isvalidated(input, min, max) {
+
+            if (!$.isNumeric(input)) {
+                Swal.fire(
+                    'تنبية',
+                    'يوجد سؤال بدون درجة',
+                    'warning'
+                );
+                return false;
+            } else {
+                message = (input <= max) ? (input >= min ? "خطأ بالدرجات" : " خطأ بالدرجات ") : " خطأ بالدرجات " ;
+                Swal.fire(
+                    'تنبية',
+                    message,
+                    'warning'
+                );
+                return false;
+            }
+        }
+    </script>

@@ -100,4 +100,35 @@ namespace AdminPanel.Models
     {
         public List<StudentCompetitionQuestionAnswer> StudentCompetitionQuestionAnswers { get; set; }
     }
+    public class CorrectorIndexVM
+    {
+        public ApplicationUser Student { get; set; }
+        public Competitions Competition { get; set; }
+        public double CompetitionFullScore { get; set; }
+        public float? StudentScore { get; set; }
+    }
+    public class CorrectorVM
+    {
+        public long Id { get; set; }
+        public long CompetitionId { get; set; }
+        public string CompetitionName { get; set; }
+        public long QuestionId { get; set; }
+        public string QuestionName { get; set; }
+        public long AnswerDetailId { get; set; } /*right answer*/
+        public string AnswerDetailText { get; set; } /*right answer text*/
+        public long? ActualAnswerDetailId { get; set; } /*selected answer*/
+        public string ActualAnswerDetailText { get; set; } /*selected answer text*/
+        public string ActualFreeTextAnswer { get; set; } /*selected answer free text مقالى*/
+        public float? StudentScore { get; set; }
+        public float QuestionScore { get; set; } /*درجة الطالب*/
+    }
+    public class SubmitStudentAnswersVM
+    {
+        public List<SubmitStudentAnswersSingleObject> Data { get; set; }
+    }
+    public class SubmitStudentAnswersSingleObject
+    { 
+        public long Id { get; set; }
+        public float StudentScore { get; set; }
+    }
 }

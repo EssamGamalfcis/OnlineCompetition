@@ -519,7 +519,7 @@ namespace OnlineCompetition.MVC.Controllers
                 CompetitionStudentToSolveVM newObj = new CompetitionStudentToSolveVM();
                 newObj.Competitions = item.Competitions;
                 newObj.CompetitionsUsers = item.CompetitionsUsers;
-                newObj.ActualScore = item.TotalScore;
+                newObj.ActualScore = item.ActualScore;
                 var questionsId = await _db.CompetitionQuestionsAnswers.Where(x => x.CompetitionsId == item.Competitions.Id).Select(x=>x.QuestionId).ToListAsync();
                 newObj.TotalScore =  _db.Questions.Where(x => questionsId.Contains(x.Id)).Select(x => x.TotalScore).ToList().Sum();
                 newObj.SolvedBefore = _db.CompetitionsUsers.FirstOrDefault(x => x.CompetitionId == item.Competitions.Id && x.StudentUserId == userId).SolvedBefore;
@@ -564,6 +564,8 @@ namespace OnlineCompetition.MVC.Controllers
                 {
                     var newStudentCompetitionQuestionAnswer = new StudentCompetitionQuestionAnswer();
                     newStudentCompetitionQuestionAnswer = StudentCompetitionQuestionAnswer;
+                    newStudentCompetitionQuestionAnswer.StudentUserId = userId;
+                    newStudentCompetitionQuestionAnswer.StudentScore = null;
                     newStudentCompetitionQuestionAnswer.RightAnswersDetailsId = _db.CompetitionQuestionsAnswers.FirstOrDefault(x => x.CompetitionsId == StudentCompetitionQuestionAnswer.CompetitionId && x.QuestionId == StudentCompetitionQuestionAnswer.QuestionsId).AnswersDetailsId;
                     await _db.StudentCompetitionQuestionAnswer.AddAsync(newStudentCompetitionQuestionAnswer);
                     await _db.SaveChangesAsync();
@@ -591,5 +593,113 @@ namespace OnlineCompetition.MVC.Controllers
             }
         }
         /*end student competition*/
+        /*start corrector competition*/
+
+        [HttpGet]
+        [Authorize(Roles = "Corrector,Teacher")]
+        public async Task<ActionResult> GetCompetitionToCorrectIndex(long? competitionId)
+        {
+            var model = new List<CorrectorIndexVM>();
+            var modelToSend = new List<CorrectorIndexVM>();
+            if (competitionId == null)
+            {
+                model = (from COMUS in _db.CompetitionsUsers
+                         join COM in _db.Competitions on COMUS.CompetitionId equals COM.Id
+                         join STUD in _db.Users on COMUS.StudentUserId equals STUD.Id
+                         where COMUS.SolvedBefore == true
+                         select new CorrectorIndexVM
+                         {
+                             Competition = COM,
+                             Student = STUD,
+                             StudentScore = COMUS.Score
+                         
+                         }).ToList();
+            }
+            foreach (var item in model)
+            {
+                CorrectorIndexVM newObj = new CorrectorIndexVM();
+                newObj = item;
+                var questionsId = await _db.CompetitionQuestionsAnswers.Where(x => x.CompetitionsId == newObj.Competition.Id).Select(x => x.QuestionId).ToListAsync();
+                newObj.CompetitionFullScore = _db.Questions.Where(x => questionsId.Contains(x.Id)).Select(x => x.TotalScore).ToList().Sum();
+                modelToSend.Add(newObj);
+            }
+            return View(modelToSend);
+        }
+        [HttpGet]
+        [Authorize(Roles = "Corrector,Teacher")]
+        public async Task<ActionResult> GetCompetitionToCorrect(long competitionId ,string userId)
+        {
+            try
+            {
+                var model = new List<CorrectorVM>();
+                model = (from STAN in _db.StudentCompetitionQuestionAnswer
+                         join COM in _db.Competitions on STAN.CompetitionId equals COM.Id
+                         join QU in _db.Questions on STAN.QuestionsId equals QU.Id
+                         where STAN.CompetitionId == competitionId && STAN.StudentUserId == userId
+                         select new CorrectorVM
+                         {
+                             Id = STAN.Id,
+                             CompetitionId = STAN.CompetitionId,
+                             CompetitionName = COM.NameAR,
+                             QuestionId = STAN.Id,
+                             QuestionName = QU.NameAR,
+                             ActualAnswerDetailId = STAN.ActualAnswersDetailId,
+                             ActualAnswerDetailText = STAN.ActualAnswersDetailId == null ? null : _db.AnswersDetails.FirstOrDefault(x=>x.Id == STAN.ActualAnswersDetailId.Value).AnswerText,
+                             ActualFreeTextAnswer = STAN.ActualAnswersText,
+                             AnswerDetailId = STAN.RightAnswersDetailsId,
+                             AnswerDetailText = _db.AnswersDetails.FirstOrDefault(x => x.Id == STAN.RightAnswersDetailsId).AnswerText,
+                             StudentScore = STAN.StudentScore,
+                             QuestionScore = QU.TotalScore
+                         }).ToList();
+                return PartialView("_CorrectCompetition", model);
+            }
+            catch (Exception e)
+            {
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Corrector,Teacher")]
+        public async Task<ActionResult> SubmitStudentScore(SubmitStudentAnswersVM obj)
+        {
+            try
+            {
+                float studentTotalScore = 0;
+                string studId = "";
+                long competitionId = 0;
+                foreach (var StudentCompetitionQuestionAnswer in obj.Data)
+                {
+                    var newStudentCompetitionQuestionAnswer = await _db.StudentCompetitionQuestionAnswer.FirstOrDefaultAsync(x => x.Id == StudentCompetitionQuestionAnswer.Id);
+                    newStudentCompetitionQuestionAnswer.StudentScore = StudentCompetitionQuestionAnswer.StudentScore;
+                    studentTotalScore += newStudentCompetitionQuestionAnswer.StudentScore == null ? 0 : newStudentCompetitionQuestionAnswer.StudentScore.Value;
+                    if (studId == "" && competitionId == 0)
+                    {
+                        studId = newStudentCompetitionQuestionAnswer.StudentUserId;
+                        competitionId = newStudentCompetitionQuestionAnswer.CompetitionId;
+                    }
+                }
+                var competitionUser = await _db.CompetitionsUsers.FirstOrDefaultAsync(x => x.CompetitionId == competitionId && x.StudentUserId == studId);
+                competitionUser.Score = studentTotalScore;
+                await _db.SaveChangesAsync();
+                var retObj = new Response
+                {
+                    ArabicMsg = "تم الحفظ بنجاح",
+                    EnglishMsg = "Saved Successfully",
+                    Success = true
+                };
+                return Ok(retObj);
+            }
+            catch (Exception e)
+            {
+                var retObj = new Response
+                {
+                    ArabicMsg = "خطأ بالسيرفر",
+                    EnglishMsg = "Server Error",
+                    Success = false
+                };
+                return Ok(retObj);
+            }
+        }
     }
 }

@@ -1,0 +1,64 @@
+﻿@using AdminPanel.Models
+@model List<CorrectorIndexVM>
+@{ ViewData["Title"] = "Cometition Index";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<link href="~/css/fontawesome.css" rel="stylesheet" />
+<script src="~/js/sweetalert2.js"></script>
+
+<h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">المسابقات المحلولة</h1>
+
+<div id='correctCompetitionModal' class='modal fade' data-url='@Url.Action("GetCompetitionToCorrect")?competitionId=0&userId=99'>
+    <div id='correctCompetitionContainer' class="container partialViewModal">
+    </div>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>أسم المسابقة</th>
+            <th>أسم الطالب</th>
+            <th>المدة</th>
+            <th>الدرجة القصوى</th>
+            <th>درجة الطالب</th>
+            <th style="text-align:center">تصحيح</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(int i=0; i<Model.Count();i++)
+        {
+            string studentFullName = Model[i].Student.FirstName + Model[i].Student.LastName;
+            string studnetScore = Model[i].StudentScore == null ? "لم يتم التصحيح بعد" : Model[i].StudentScore.ToString();
+            <tr>
+                <td>@Model[i].Competition.NameAR</td>
+                <td>@studentFullName</td>
+                <td>@Model[i].Competition.Duration</td>
+                <td>@Model[i].CompetitionFullScore</td>
+                <td>@studnetScore</td>
+                <td style="text-align:center">
+                    <a class="btn btn-primary correctCompetition" style="cursor: pointer; color: white;" userId="@Model[i].Student.Id" competitionId="@Model[i].Competition.Id">Correct</a>
+                </td>
+            </tr> 
+          }
+            </tbody>
+        </table>
+        <script>
+            $(document).ready(function () {
+                $('.correctCompetition').click(function () {
+                    var url = $('#correctCompetitionModal').data('url');
+                    url = url.replace('0', $(this).attr('competitionId'))
+                    url = url.replace('99', $(this).attr('userId'))
+                    $.get(url, function (data) {
+                        $('#correctCompetitionContainer').html(data);
+                        $("#correctCompetitionModal").addClass("in");
+                        $(".modal-backdrop").show()
+                        $("#correctCompetitionModal").show();
+                        $('#correctCompetitionModal').modal('show');
+                    });
+                });
+            });
+            function Cancel() {
+                $("#correctCompetitionModal").removeClass("in");
+                $(".modal-backdrop").hide()
+                $("#correctCompetitionModal").hide();
+            }
+        </script>

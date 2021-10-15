@@ -19,7 +19,6 @@ namespace OnlineCompetition.Models
         public long RightAnswersDetailsId { get; set; } /*right Answer*/
         public long? ActualAnswersDetailId { get; set; } /*student answer*/
         public string ActualAnswersText { get; set; } /*student free text answer*/
-
-
+        public float? StudentScore { get; set; } 
     }
 }
