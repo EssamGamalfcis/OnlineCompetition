@@ -20,10 +20,9 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 
-namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
+namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account.Student
 {
-    [Authorize(Roles = "Admin")]
-    public class RegisterModel : PageModel
+    public class StudentRegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -31,7 +30,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        public RegisterModel(
+        public StudentRegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
@@ -77,13 +76,11 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
             [Display(Name = "الصورة الشخصية")]
             public string ImagePath { get; set; }
         }
-
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
-
         public async Task<IActionResult> OnPostAsync(IFormFile file, string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
@@ -117,7 +114,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
              _logger.LogInformation("User created a new account with password.");
-             //await _userManager.AddToRoleAsync(user, Enums.Roles.Teacher.ToString());
+             await _userManager.AddToRoleAsync(user, Enums.Roles.Student.ToString());
              var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
              code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
              var callbackUrl = Url.Page(
@@ -135,7 +132,7 @@ namespace OnlineCompetition.MVC.Areas.Identity.Pages.Account
              }
              else
              {
-                 //await _signInManager.SignInAsync(user, isPersistent: false);
+                 await _signInManager.SignInAsync(user, isPersistent: false);
                  return LocalRedirect(returnUrl);
              }
             }

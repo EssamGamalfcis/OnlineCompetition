@@ -29,13 +29,22 @@
                 {
                     studentScore = item.StudentScore;
                 }
-                <tr>
-                    <td style=" text-align: center;">@item.QuestionName</td>
-                    <td style=" text-align: center;">@item.AnswerDetailText</td>
-                    <td style=" text-align: center;">@studnetAnswerText</td>
-                    <td style=" text-align: center;">@item.QuestionScore</td>
-                    <td><input min="0" max="@item.QuestionScore" class="form-control" STANId="@item.Id" style=" width: 50%; margin-right: 20%;" type="number" value="@studentScore" /></td>
-                </tr>
+            <tr>
+                <td style=" text-align: center;">@item.QuestionName</td>
+                <td style=" text-align: center;">@item.AnswerDetailText</td>
+                <td style=" text-align: center;">@studnetAnswerText</td>
+                <td style=" text-align: center;">@item.QuestionScore</td>
+                @{
+                    if (studentScore != 0)
+                    {
+                        <td><input min="0" max="@item.QuestionScore" class="form-control" STANId="@item.Id" style=" width: 50%; margin-right: 20%;" type="number" value="@studentScore" readonly /></td>
+                    }
+                    else
+                    {
+                        <td><input min="0" max="@item.QuestionScore" class="form-control" STANId="@item.Id" style=" width: 50%; margin-right: 20%;" type="number" value="@studentScore" /></td>
+                    }
+                }
+            </tr>
             }
         </tbody>
     </table>

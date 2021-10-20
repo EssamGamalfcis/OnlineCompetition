@@ -44,6 +44,12 @@ namespace OnlineCompetition.MVC.Controllers
             {
                 if (obj.Id == 0)
                 {
+                    List<Competitions> competitions = await _db.Competitions.ToListAsync();
+                    foreach (var competition in competitions)
+                    {
+                        competition.IsActive = false;
+                    }
+                    _db.SaveChanges();
                     Competitions newCompetition = new Competitions();
                     newCompetition.IsActive = obj.IsActive;
                     newCompetition.IsDeleted = false;
@@ -53,6 +59,21 @@ namespace OnlineCompetition.MVC.Controllers
                     newCompetition.Duration = obj.Duration;
                     await _db.Competitions.AddAsync(newCompetition);
                     _db.SaveChanges();
+                    List<ApplicationUser> students = await (from user in _db.Users
+                                                      join userRole in _db.UserRoles on user.Id equals userRole.UserId
+                                                      join role in _db.Roles on userRole.RoleId equals role.Id
+                                                      where role.Name == "Student"
+                                                      select user).ToListAsync();
+                    foreach (var stud in students)
+                    {
+                        var newCompetitionUser = new CompetitionsUsers();
+                        newCompetitionUser.CompetitionId = newCompetition.Id;
+                        newCompetitionUser.SolvedBefore = false;
+                        newCompetitionUser.StudentUserId = stud.Id;
+                        newCompetitionUser.Score = null;
+                        await _db.CompetitionsUsers.AddAsync(newCompetitionUser);
+                        _db.SaveChanges();
+                    }
                     var retObj = new Response
                     {
                         ArabicMsg = "تم الحفظ بنجاح",
@@ -560,18 +581,42 @@ namespace OnlineCompetition.MVC.Controllers
             try
             {
                 string userId = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).Id;
+                float? actualScore = null;
                 foreach (var StudentCompetitionQuestionAnswer in obj.StudentCompetitionQuestionAnswers)
                 {
                     var newStudentCompetitionQuestionAnswer = new StudentCompetitionQuestionAnswer();
                     newStudentCompetitionQuestionAnswer = StudentCompetitionQuestionAnswer;
                     newStudentCompetitionQuestionAnswer.StudentUserId = userId;
-                    newStudentCompetitionQuestionAnswer.StudentScore = null;
                     newStudentCompetitionQuestionAnswer.RightAnswersDetailsId = _db.CompetitionQuestionsAnswers.FirstOrDefault(x => x.CompetitionsId == StudentCompetitionQuestionAnswer.CompetitionId && x.QuestionId == StudentCompetitionQuestionAnswer.QuestionsId).AnswersDetailsId;
+                    if (string.IsNullOrEmpty(StudentCompetitionQuestionAnswer.ActualAnswersText) == true)
+                    {
+                        long questionId = StudentCompetitionQuestionAnswer.QuestionsId;
+                        float questionFullScore =  _db.Questions.Where(x => x.Id == questionId).FirstOrDefault().TotalScore;
+                        newStudentCompetitionQuestionAnswer.StudentScore = StudentCompetitionQuestionAnswer.ActualAnswersDetailId == newStudentCompetitionQuestionAnswer.RightAnswersDetailsId ? questionFullScore : 0;
+                        actualScore += newStudentCompetitionQuestionAnswer.StudentScore;
+                        actualScore = actualScore == null ? 0 : actualScore;
+                    }
                     await _db.StudentCompetitionQuestionAnswer.AddAsync(newStudentCompetitionQuestionAnswer);
                     await _db.SaveChangesAsync();
                 }
+                long competitionId = obj.StudentCompetitionQuestionAnswers[0].CompetitionId;
+                bool isValidToCorrect = true;
+                var competitionQuestionsAnswers = await _db.CompetitionQuestionsAnswers.Where(x => x.CompetitionsId == competitionId).ToListAsync();
+                foreach (var competitionQuestionsAnswer in competitionQuestionsAnswers)
+                {
+                    AnswersMaster answerMaster = await _db.AnswersMaster.FirstOrDefaultAsync(x => x.Id == competitionQuestionsAnswer.AnswersMasterId);
+                    if (answerMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
+                    {
+                        isValidToCorrect = false;
+                        break;
+                    }
+                }
                 var competitionUser = _db.CompetitionsUsers.FirstOrDefault(x => x.StudentUserId == userId && x.CompetitionId == obj.StudentCompetitionQuestionAnswers[0].CompetitionId);
                 competitionUser.SolvedBefore = true;
+                if (isValidToCorrect)
+                {
+                    competitionUser.Score = actualScore;
+                }
                 await _db.SaveChangesAsync();
                 var retObj = new Response
                 {
@@ -606,7 +651,7 @@ namespace OnlineCompetition.MVC.Controllers
                 model = (from COMUS in _db.CompetitionsUsers
                          join COM in _db.Competitions on COMUS.CompetitionId equals COM.Id
                          join STUD in _db.Users on COMUS.StudentUserId equals STUD.Id
-                         where COMUS.SolvedBefore == true
+                         where COMUS.SolvedBefore == true && COMUS.Score == null
                          select new CorrectorIndexVM
                          {
                              Competition = COM,
