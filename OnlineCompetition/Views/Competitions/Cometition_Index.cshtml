@@ -21,34 +21,42 @@
             <th>تاريخ الانشاء</th>
             <th>المدة</th>
             <th>نشط</th>
+            <th style="text-align: center">أضافة اسألة</th>
             <th style="text-align:center">تعديل / حذف</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var OnlineCompetition in Model)
         {
-<tr>
-    <td>@OnlineCompetition.NameAR</td>
-    <td>@OnlineCompetition.CreationDate.ToString("MM/dd/yyyy")</td>
-    <td>@OnlineCompetition.Duration</td>
-    @{
-    if(OnlineCompetition.IsActive == true)
-    {
-    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10004;</span></td>
-    }
-    else
-    {
-    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10008;</span></td>
-    }
-    }
-    <td style="text-align:center">
-        <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" onclick="Delete(this)">حذف</a>
-        <a class="btn btn-primary editCompetition" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id">تعديل</a>
-    </td>
-</tr> }
+        <tr>
+            <td>@OnlineCompetition.NameAR</td>
+            <td>@OnlineCompetition.CreationDate.ToString("MM/dd/yyyy")</td>
+            <td>@OnlineCompetition.Duration</td>
+            @{
+                if (OnlineCompetition.IsActive == true)
+                {
+                    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10004;</span></td>
+                }
+                else
+                {
+                    <td><span style="font-family: Arial Unicode MS, Lucida Grande">&#10008;</span></td>
+                }
+            }
+            <td style="text-align:center">
+                <a class="btn btn-secondary" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" onclick="GoToQuestions(@OnlineCompetition.Id)">أضف</a>
+            </td>
+            <td style="text-align:center">
+                <a class="btn btn-danger" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id" onclick="Delete(this)">حذف</a>
+                <a class="btn btn-primary editCompetition" style="cursor: pointer; color: white;" competitionId="@OnlineCompetition.Id">تعديل</a>
+            </td>
+        </tr> }
             </tbody>
         </table>
-        <script>
+<script>
+            function GoToQuestions(competitionId) {
+                window.location.href = '@Url.Action("Question_Index", "Competitions")?competitionId=' + competitionId;
+            }
+
             $(document).ready(function () {
                 $('#addCompetition').click(function () {
                     var url = $('#addCompetitionModal').data('url');
@@ -133,4 +141,4 @@
                     }
                 })
             }
-        </script>
+</script>

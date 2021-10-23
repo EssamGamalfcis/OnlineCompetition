@@ -8,6 +8,29 @@
 
 <h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">أعدادت ألاسألة</h1>
 
+<select class="form-control" id="compeitions" style="width: 30%; float: left;" onchange="GetFilteredQuestions(this)">
+    @{
+        foreach (var competition in ViewBag.AllCompetitions)
+        {
+            if (competition.Id == ViewBag.CompetitionId)
+            {
+                <option value="@competition.Id" selected>@competition.NameAR</option>
+            }
+            else
+            {
+                <option value="@competition.Id">@competition.NameAR</option>
+            }
+        }
+    }
+</select>
+
+<div id='addAnswerModal' class='modal fade' data-url='@Url.Action("AddOrEditAnswer")?id=0'>
+    <div id='addAnswerContainer' class="container partialViewModal">
+    </div>
+</div>
+
+
+
 <div id='addQuestionModal' class='modal fade' data-url='@Url.Action("AddOrEditQuestions")?id=0'>
     <div id='addQuestionContainer' class="container partialViewModal">
     </div>
@@ -20,6 +43,7 @@
             <th>أسم السؤال</th>
             <th>الترتيب</th>
             <th>الدرجة</th>
+            <th style="text-align:center">اضافة اجابة</th>
             <th style="text-align:center">تعديل / حذف</th>
         </tr>
     </thead>
@@ -31,14 +55,42 @@
             <td>@Question.Sort</td>
             <td>@Question.TotalScore</td>
             <td style="text-align:center">
+                <a class="btn btn-secondary addAnswer" style="cursor: pointer; color: white;" >اضف</a>
+            </td>
+            <td style="text-align:center">
                 <a class="btn btn-danger" style="cursor: pointer; color: white;" questionId="@Question.Id" onclick="Delete(this)">حذف</a>
                 <a class="btn btn-primary editQuestions" style="cursor: pointer; color: white;" questionId="@Question.Id">تعديل</a>
             </td>
-        </tr> 
-         }
-            </tbody>
-        </table>
-        <script>
+        </tr>
+
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $('.addAnswer').click(function () {
+            var url = $('#addAnswerModal').data('url');
+            //url = url.replace('0', $(this).attr('answerMasterId'))
+            $.get(url, function (data) {
+                $('#addAnswerContainer').html(data);
+                $("#addAnswerModal").addClass("in");
+                $(".modal-backdrop").show()
+                $("#addAnswerModal").show();
+                $('#addAnswerModal').modal('show');
+            });
+        });
+    });
+    function Cancel2() {
+        $("#addAnswerModal").removeClass("in");
+        $(".modal-backdrop").hide()
+        $("#addAnswerModal").hide();
+    }
+
+
+
+    function GetFilteredQuestions(obj) {
+        window.location.href = '@Url.Action("Question_Index", "Competitions")?competitionId=' + $(obj).val();
+    }
             $(document).ready(function () {
                 $('#addQuestion').click(function () {
                     var url = $('#addQuestionModal').data('url');
@@ -121,4 +173,4 @@
                     }
                 })
             }
-        </script>
+</script>

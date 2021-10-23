@@ -144,9 +144,17 @@ namespace OnlineCompetition.MVC.Controllers
         /*end competition setup*/
         /*qesutions setup*/
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> Question_Index()
+        public async Task<ActionResult> Question_Index(long? competitionId)
         {
-            var data = await _db.Questions.Where(x => x.IsDeleted != true).OrderByDescending(x => x.CreationDate).ToListAsync();
+            //var data = await _db.Questions.Where(x => x.IsDeleted != true).OrderByDescending(x => x.CreationDate).ToListAsync();
+            long competitionIdToQuery = competitionId == null ?  _db.Competitions.FirstOrDefault(x => x.IsActive == true).Id : competitionId.Value;
+            var data = await (from QU in _db.Questions
+                        join COMQU in _db.CompetitionQuestionsAnswers on QU.Id equals COMQU.QuestionId
+                        where QU.IsDeleted != true && COMQU.CompetitionsId == competitionIdToQuery
+                        select QU
+                        ).ToListAsync();
+            ViewBag.CompetitionId = competitionIdToQuery;
+            ViewBag.AllCompetitions = await _db.Competitions.Where(x=>x.IsDeleted != true).ToListAsync();
             return View(data);
         }
         [HttpGet]
