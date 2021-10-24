@@ -6,7 +6,7 @@
 <link href="~/css/fontawesome.css" rel="stylesheet" />
 <script src="~/js/sweetalert2.js"></script>
 
-<h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">أعدادت ألاسألة</h1>
+<h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px;">أعدادت ألاسألة(لن يتم أضافة الاسألة التى لم يتم أضافة أجابات لها)</h1>
 
 <select class="form-control" id="compeitions" style="width: 30%; float: left;" onchange="GetFilteredQuestions(this)">
     @{
@@ -24,7 +24,7 @@
     }
 </select>
 
-<div id='addAnswerModal' class='modal fade' data-url='@Url.Action("AddOrEditAnswer")?id=0'>
+<div id='addAnswerModal' class='modal fade' data-url='@Url.Action("AddOrEditAnswer")?id=0&questionId=99'>
     <div id='addAnswerContainer' class="container partialViewModal">
     </div>
 </div>
@@ -55,7 +55,7 @@
             <td>@Question.Sort</td>
             <td>@Question.TotalScore</td>
             <td style="text-align:center">
-                <a class="btn btn-secondary addAnswer" style="cursor: pointer; color: white;" >اضف</a>
+                <a class="btn btn-secondary addAnswer" questionId="@Question.Id" style="cursor: pointer; color: white;" >اضف</a>
             </td>
             <td style="text-align:center">
                 <a class="btn btn-danger" style="cursor: pointer; color: white;" questionId="@Question.Id" onclick="Delete(this)">حذف</a>
@@ -71,6 +71,7 @@
         $('.addAnswer').click(function () {
             var url = $('#addAnswerModal').data('url');
             //url = url.replace('0', $(this).attr('answerMasterId'))
+            url = url.replace('99', $(this).attr('questionId'))
             $.get(url, function (data) {
                 $('#addAnswerContainer').html(data);
                 $("#addAnswerModal").addClass("in");

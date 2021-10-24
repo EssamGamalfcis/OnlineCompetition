@@ -52,6 +52,14 @@ namespace AdminPanel.Models
     }
     public class AnsewrsVM
     {
+        public long QuestionId { get; set; }
+        public AnswersMaster AnswersMaster { get; set; }
+        public List<AnswersDetails> AnswersDetails { get; set; }
+    }
+    public class AnsewrsNewVM
+    {
+        public long CompetitionId { get; set; }
+        public long QuestionId { get; set; }
         public AnswersMaster AnswersMaster { get; set; }
         public List<AnswersDetails> AnswersDetails { get; set; }
     }

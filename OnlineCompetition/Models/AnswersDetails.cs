@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace OnlineCompetition.Models
         public virtual AnswersMaster AnswerMaster { get; set; }
         public long AnswerMasterId { get; set; }
         public string AnswerText { get; set; }
+        [NotMapped]
+        public bool IsRight { get; set; }
     }
 }

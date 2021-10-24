@@ -43,13 +43,48 @@
                </select>
            </div>
        </div>
+       <div class="form-row" id="TrueAndFalse" style="display: table-cell; padding-right: 29px; padding-top: 29px; ">
+           <div class="m-formGroup">
+               <input class="a-input" type="radio" name="radios2" id="true">
+               <label for="true"></label>
+               <label class="-text" for="true">صح</label>
+           </div>
+           <div class="m-formGroup">
+               <input class="a-input" type="radio" name="radios2" id="false">
+               <label for="false"></label>
+               <label class="-text" for="false">خطأ</label>
+           </div>
+
+
+       </div>
        <div class="form-row" id="multiAnswers" style="display:none">
            <div class="col">
-               <input class="form-control form-control-sm" value="@answer1" type="text" style="margin-top: 10px;" placeholder="الاجابة الاولى">
-               <input class="form-control form-control-sm" value="@answer2" type="text" style="margin-top: 10px;" placeholder="الاجابة الثانية">
-               <input class="form-control form-control-sm" value="@answer3" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الثالثة" id="multiAnswers3">
-               <input class="form-control form-control-sm" value="@answer4" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الرابعة" id="multiAnswers4">
-               <input class="form-control form-control-sm" value="@answer5" type="text" style="margin-top: 10px; display: none" placeholder="الاجابة الخامسة" id="multiAnswers5">
+
+               <div class="m-formGroup" style="display: table; padding-top: 29px;">
+                   <input class="a-input" type="radio" name="radios" id="answer1">
+                   <label for="answer1"></label>
+                   <label class="-text" for="answer1"><input class="form-control form-control-sm" value="@answer1" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الاولى"></label>
+               </div>
+               <div class="m-formGroup" style="display: table;">
+                   <input class="a-input" type="radio" name="radios" id="answer2">
+                   <label for="answer2"></label>
+                   <label class="-text" for="answer2"><input class="form-control form-control-sm" value="@answer2" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الثانية"></label>
+               </div>
+               <div class="m-formGroup" style="display: none;" id="multiAnswers3">
+                   <input class="a-input" type="radio" name="radios" id="answer3">
+                   <label for="answer3"></label>
+                   <label class="-text" for="answer3"><input class="form-control form-control-sm" value="@answer3" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الثالثة"></label>
+               </div>
+               <div class="m-formGroup" style="display: none;" id="multiAnswers4">
+                   <input class="a-input"  type="radio" name="radios" id="answer4">
+                   <label for="answer4"></label>
+                   <label class="-text" for="answer4"><input class="form-control form-control-sm" value="@answer4" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الرابعة"></label>
+               </div>
+               <div class="m-formGroup" style="display: none;" id="multiAnswers5">
+                   <input class="a-input"  type="radio" name="radios" id="answer5">
+                   <label for="answer5"></label>
+                   <label class="-text" for="answer5"><input class="form-control form-control-sm" value="@answer5" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الخامسة"></label>
+               </div>
            </div>
        </div>
         <div class="form-row" style="margin-right: 43%; margin-top: 20px; padding-bottom: 20px; ">
@@ -74,10 +109,17 @@
         if ($('#AnswerType').val() == 1) {
             $('#AnswersNumberDiv').show();
             $('#multiAnswers').show();
+            $('#TrueAndFalse').hide();
+        }
+        else if ($('#AnswerType').val() == 0) {
+            $('#AnswersNumberDiv').hide();
+            $('#multiAnswers').hide();
+            $('#TrueAndFalse').show();
         }
         else {
             $('#multiAnswers').hide();
             $('#AnswersNumberDiv').hide();
+            $('#TrueAndFalse').hide();
         }
     }
     function ShowAndHideAnswers() {
@@ -88,18 +130,24 @@
         }
         else if ($('#AnswersNumber').val() == 3) {
             $('#multiAnswers3').show();
+            $("#multiAnswers3").css("display","table");
             $('#multiAnswers4').hide();
             $('#multiAnswers5').hide();
         }
         else if ($('#AnswersNumber').val() == 4) {
             $('#multiAnswers3').show();
+            $("#multiAnswers3").css("display", "table");
             $('#multiAnswers4').show();
+            $("#multiAnswers4").css("display", "table");
             $('#multiAnswers5').hide();
         }
         else if ($('#AnswersNumber').val() == 5) {
             $('#multiAnswers3').show();
+            $("#multiAnswers3").css("display", "table");
             $('#multiAnswers4').show();
+            $("#multiAnswers4").css("display", "table");
             $('#multiAnswers5').show();
+            $("#multiAnswers5").css("display", "table");
         }
     }
     function AnswerSaveChange() {
@@ -139,8 +187,8 @@
         }
         $.ajax({
             type: "POST",
-            url: "@Url.Action("AddOrUpdateAnswer")",
-            data: { AnswersMaster: answerMaster, AnswersDetails: answerDetails},
+            url: "@Url.Action("AddOrUpdateAnswerNew")",
+            data: { AnswersMaster: answerMaster, AnswersDetails: answerDetails, CompetitionId: $('#compeitions').val(), QuestionId: '@Model.QuestionId' },
             dataType: "text",
             success: function (response) {
                 if ($.parseJSON(response).success == true || $.parseJSON(response).success == "true") {

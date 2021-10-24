@@ -260,7 +260,7 @@ namespace OnlineCompetition.MVC.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> AddOrEditAnswer(long? id)
+        public async Task<ActionResult> AddOrEditAnswer(long? id,long questionId)
         {
             var model = new AnsewrsVM();
             if (id != 0)
@@ -269,16 +269,127 @@ namespace OnlineCompetition.MVC.Controllers
                          where AM.Id == id
                          select new AnsewrsVM
                          {
+                             QuestionId = questionId,
                              AnswersMaster = AM,
                              AnswersDetails = _db.AnswersDetails.Where(x => x.AnswerMasterId == AM.Id).ToList()
                          }).FirstOrDefault();
             }
             else
             {
+                model.QuestionId = questionId;
                 model.AnswersMaster = new AnswersMaster();
                 model.AnswersDetails = new List<AnswersDetails>();
             }
             return PartialView("_AddOrEditAnswers", model);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> AddOrUpdateAnswerNew(AnsewrsNewVM obj)
+        {
+            try
+            {
+                if (obj.AnswersMaster.Id == 0)
+                {
+                    var newAnswerMaster = new AnswersMaster();
+                    newAnswerMaster = obj.AnswersMaster;
+                    newAnswerMaster.CreationDate = DateTime.Now;
+                    newAnswerMaster.IsDeleted = false;
+                    if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
+                    {
+                        if (_db.AnswersMaster.Any(x => x.AnswerType == OnlineCompetition.Enums.AnswerType.Article && x.IsDeleted != true))
+                        {
+                            var retObj2 = new Response
+                            {
+                                ArabicMsg = "لا يمكن اضافة اكثر من اجابة للمقالى او الصح و خطأ",
+                                EnglishMsg = "can't insert more than one article or true and false answer",
+                                Success = false
+                            };
+                            return Ok(retObj2);
+                        }
+                    }
+                    if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse)
+                    {
+                        if (_db.AnswersMaster.Any(x => x.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse && x.IsDeleted != true))
+                        {
+                            var retObj2 = new Response
+                            {
+                                ArabicMsg = "لا يمكن اضافة اكثر من اجابة للمقالى او الصح و خطأ",
+                                EnglishMsg = "can't insert more than one article or true and false answer",
+                                Success = false
+                            };
+                            return Ok(retObj2);
+                        }
+                    }
+                    _db.AnswersMaster.Add(newAnswerMaster);
+                    await _db.SaveChangesAsync();
+                    if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
+                    {
+                        var newAnswerDetail = new AnswersDetails();
+                        newAnswerDetail.AnswerText = "مقالى";
+                        newAnswerDetail.AnswerMasterId = newAnswerMaster.Id;
+                        _db.AnswersDetails.Add(newAnswerDetail);
+                        await _db.SaveChangesAsync();
+                    }
+                    else if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse)
+                    {
+                        var newAnswerDetail = new AnswersDetails();
+                        newAnswerDetail.AnswerText = "صح";
+                        newAnswerDetail.AnswerMasterId = newAnswerMaster.Id;
+                        _db.AnswersDetails.Add(newAnswerDetail);
+                        var newAnswerDetail2 = new AnswersDetails();
+                        newAnswerDetail2.AnswerText = "خطأ";
+                        newAnswerDetail2.AnswerMasterId = newAnswerMaster.Id;
+                        _db.AnswersDetails.Add(newAnswerDetail2);
+                        await _db.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        foreach (var answersDetail in obj.AnswersDetails)
+                        {
+                            var newAnswerDetail = new AnswersDetails();
+                            newAnswerDetail = answersDetail;
+                            newAnswerDetail.AnswerText = answersDetail.AnswerText;
+                            newAnswerDetail.AnswerMasterId = newAnswerMaster.Id;
+                            _db.AnswersDetails.Add(newAnswerDetail);
+                        }
+                        await _db.SaveChangesAsync();
+                    }
+                    CompetitionQuestionsAnswers newCompetitionAnswer = new CompetitionQuestionsAnswers();
+                    newCompetitionAnswer.CompetitionsId = obj.CompetitionId;
+                    newCompetitionAnswer.QuestionId = obj.QuestionId;
+                    newCompetitionAnswer.AnswersDetailsId = 
+                    newCompetitionAnswer.AnswersMasterId = newAnswerMaster.Id;
+                }
+                else
+                {
+                    var newAnswerMaster = await _db.AnswersMaster.FirstOrDefaultAsync(x => x.Id == obj.AnswersMaster.Id);
+                    newAnswerMaster.DeleteDate = DateTime.Now;
+                    newAnswerMaster.IsDeleted = true;
+                    await _db.SaveChangesAsync();
+                    var deleteOldAnswerDetails = await _db.AnswersDetails.Where(x => x.AnswerMasterId == obj.AnswersMaster.Id).ToListAsync();
+                    _db.AnswersDetails.RemoveRange(deleteOldAnswerDetails);
+                    await _db.SaveChangesAsync();
+                    obj.AnswersMaster.Id = 0;
+                    await AddOrUpdateAnswerNew(obj);
+                }
+                var retObj = new Response
+                {
+                    ArabicMsg = "تم الحفظ بنجاح",
+                    EnglishMsg = "Saved Successfully",
+                    Success = true
+                };
+                return Ok(retObj);
+            }
+            catch (Exception e)
+            {
+                var retObj = new Response
+                {
+                    ArabicMsg = "خطأ بالسيرفر",
+                    EnglishMsg = "Server Error",
+                    Success = false
+                };
+                return Ok(retObj);
+            }
         }
         [HttpPost]
         [Authorize(Roles = "Admin")]
