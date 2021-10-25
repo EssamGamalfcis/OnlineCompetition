@@ -180,6 +180,30 @@ namespace OnlineCompetition.MVC.Controllers
                     obj.IsDeleted = false;
                     _db.Questions.Add(obj);
                     await _db.SaveChangesAsync();
+
+
+                    var newAnswerMaster = new AnswersMaster();
+                    newAnswerMaster.NameAR = "اجابة";
+                    newAnswerMaster.NameEN = "Answer";
+                    newAnswerMaster.AnswerType = OnlineCompetition.Enums.AnswerType.Article;
+                    newAnswerMaster.CreationDate = DateTime.Now;
+                    newAnswerMaster.IsDeleted = false;
+                    _db.AnswersMaster.Add(newAnswerMaster);
+                    await _db.SaveChangesAsync();
+
+                    /*Default*/
+                    var newAnswerDetail = new AnswersDetails();
+                    newAnswerDetail.AnswerText = "مقالى";
+                    newAnswerDetail.AnswerMasterId = newAnswerMaster.Id;
+                    _db.AnswersDetails.Add(newAnswerDetail);
+                    await _db.SaveChangesAsync();
+                    CompetitionQuestionsAnswers newCompetitionAnswer = new CompetitionQuestionsAnswers();
+                    newCompetitionAnswer.CompetitionsId = obj.CompetitionId;
+                    newCompetitionAnswer.QuestionId = obj.Id;
+                    newCompetitionAnswer.AnswersDetailsId = newAnswerDetail.Id;
+                    newCompetitionAnswer.AnswersMasterId = newAnswerMaster.Id;
+                    await _db.CompetitionQuestionsAnswers.AddAsync(newCompetitionAnswer);
+                    await _db.SaveChangesAsync();
                 }
                 else
                 {
@@ -290,36 +314,37 @@ namespace OnlineCompetition.MVC.Controllers
             {
                 if (obj.AnswersMaster.Id == 0)
                 {
+                    long answerDetailId = 0;
                     var newAnswerMaster = new AnswersMaster();
                     newAnswerMaster = obj.AnswersMaster;
                     newAnswerMaster.CreationDate = DateTime.Now;
                     newAnswerMaster.IsDeleted = false;
-                    if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
-                    {
-                        if (_db.AnswersMaster.Any(x => x.AnswerType == OnlineCompetition.Enums.AnswerType.Article && x.IsDeleted != true))
-                        {
-                            var retObj2 = new Response
-                            {
-                                ArabicMsg = "لا يمكن اضافة اكثر من اجابة للمقالى او الصح و خطأ",
-                                EnglishMsg = "can't insert more than one article or true and false answer",
-                                Success = false
-                            };
-                            return Ok(retObj2);
-                        }
-                    }
-                    if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse)
-                    {
-                        if (_db.AnswersMaster.Any(x => x.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse && x.IsDeleted != true))
-                        {
-                            var retObj2 = new Response
-                            {
-                                ArabicMsg = "لا يمكن اضافة اكثر من اجابة للمقالى او الصح و خطأ",
-                                EnglishMsg = "can't insert more than one article or true and false answer",
-                                Success = false
-                            };
-                            return Ok(retObj2);
-                        }
-                    }
+                    //if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
+                    //{
+                    //    if (_db.AnswersMaster.Any(x => x.AnswerType == OnlineCompetition.Enums.AnswerType.Article && x.IsDeleted != true))
+                    //    {
+                    //        var retObj2 = new Response
+                    //        {
+                    //            ArabicMsg = "لا يمكن اضافة اكثر من اجابة للمقالى او الصح و خطأ",
+                    //            EnglishMsg = "can't insert more than one article or true and false answer",
+                    //            Success = false
+                    //        };
+                    //        return Ok(retObj2);
+                    //    }
+                    //}
+                    //if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse)
+                    //{
+                    //    if (_db.AnswersMaster.Any(x => x.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse && x.IsDeleted != true))
+                    //    {
+                    //        var retObj2 = new Response
+                    //        {
+                    //            ArabicMsg = "لا يمكن اضافة اكثر من اجابة للمقالى او الصح و خطأ",
+                    //            EnglishMsg = "can't insert more than one article or true and false answer",
+                    //            Success = false
+                    //        };
+                    //        return Ok(retObj2);
+                    //    }
+                    //}
                     _db.AnswersMaster.Add(newAnswerMaster);
                     await _db.SaveChangesAsync();
                     if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.Article)
@@ -329,6 +354,7 @@ namespace OnlineCompetition.MVC.Controllers
                         newAnswerDetail.AnswerMasterId = newAnswerMaster.Id;
                         _db.AnswersDetails.Add(newAnswerDetail);
                         await _db.SaveChangesAsync();
+                        answerDetailId = newAnswerDetail.Id;
                     }
                     else if (obj.AnswersMaster.AnswerType == OnlineCompetition.Enums.AnswerType.TrueOrFalse)
                     {
@@ -341,6 +367,7 @@ namespace OnlineCompetition.MVC.Controllers
                         newAnswerDetail2.AnswerMasterId = newAnswerMaster.Id;
                         _db.AnswersDetails.Add(newAnswerDetail2);
                         await _db.SaveChangesAsync();
+                        answerDetailId = obj.AnswersDetails.FirstOrDefault(x => x.IsRight == true) == obj.AnswersDetails.FirstOrDefault() ? newAnswerDetail.Id : newAnswerDetail2.Id;
                     }
                     else
                     {
@@ -351,14 +378,18 @@ namespace OnlineCompetition.MVC.Controllers
                             newAnswerDetail.AnswerText = answersDetail.AnswerText;
                             newAnswerDetail.AnswerMasterId = newAnswerMaster.Id;
                             _db.AnswersDetails.Add(newAnswerDetail);
+                            await _db.SaveChangesAsync();
+                            if (answerDetailId == 0)
+                            {
+                                answerDetailId = answersDetail.IsRight ? newAnswerDetail.Id : 0;
+                            }
                         }
-                        await _db.SaveChangesAsync();
+                       
                     }
-                    CompetitionQuestionsAnswers newCompetitionAnswer = new CompetitionQuestionsAnswers();
-                    newCompetitionAnswer.CompetitionsId = obj.CompetitionId;
-                    newCompetitionAnswer.QuestionId = obj.QuestionId;
-                    newCompetitionAnswer.AnswersDetailsId = 
+                    CompetitionQuestionsAnswers newCompetitionAnswer =await _db.CompetitionQuestionsAnswers.FirstOrDefaultAsync(x => x.CompetitionsId == obj.CompetitionId && x.QuestionId == obj.QuestionId);
+                    newCompetitionAnswer.AnswersDetailsId = answerDetailId;
                     newCompetitionAnswer.AnswersMasterId = newAnswerMaster.Id;
+                    await _db.SaveChangesAsync();
                 }
                 else
                 {

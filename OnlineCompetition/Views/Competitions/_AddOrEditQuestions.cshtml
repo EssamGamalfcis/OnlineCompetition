@@ -34,6 +34,7 @@
         objToSend.NameEN = $('#QuestionNameAr').val();
         objToSend.Sort = $('#QuestionSort').val();
         objToSend.TotalScore = $('#QuestionTotalScore').val();
+        objToSend.CompetitionId = $('#compeitions').val();
         if (objToSend.Duration > 1000 || objToSend.Duration <= 0 ||
             objToSend.NameAR == '' || objToSend.NameEN == '')
         {
