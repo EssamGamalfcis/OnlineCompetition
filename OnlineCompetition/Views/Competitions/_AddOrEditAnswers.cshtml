@@ -6,20 +6,41 @@
     string answer3 = "";
     string answer4 = "";
     string answer5 = "";
+    string answer1Checked = "";
+    string answer2Checked = "";
+    string answer3Checked = "";
+    string answer4Checked = "";
+    string answer5Checked = "";
     for (int i = 0; i < Model.AnswersDetails.Count(); i++)
     {
         if (i == 0)
+        {
             answer1 = Model.AnswersDetails[i].AnswerText;
+            answer1Checked = Model.AnswersDetails[i].Id == ViewBag.AnswerDetailId ? "checked" : "";
+        }
         if (i == 1)
+        {
             answer2 = Model.AnswersDetails[i].AnswerText;
+            answer2Checked = Model.AnswersDetails[i].Id == ViewBag.AnswerDetailId ? "checked" : "";
+        }
         if (i == 2)
+        {
             answer3 = Model.AnswersDetails[i].AnswerText;
+            answer3Checked = Model.AnswersDetails[i].Id == ViewBag.AnswerDetailId ? "checked" : "";
+        }
         if (i == 3)
+        {
             answer4 = Model.AnswersDetails[i].AnswerText;
+            answer4Checked = Model.AnswersDetails[i].Id == ViewBag.AnswerDetailId ? "checked" : "";
+        }
         if (i == 4)
+        {
             answer5 = Model.AnswersDetails[i].AnswerText;
+            answer5Checked = Model.AnswersDetails[i].Id == ViewBag.AnswerDetailId ? "checked" : "";
+        }
+
     }
- }
+}
        <div class="form-row">
            <div class="col">
                <label for="AnswerName" class="partalViewModalLables">أسم الاجابة<span style="color:red">*</span></label>
@@ -45,12 +66,12 @@
        </div>
        <div class="form-row" id="TrueAndFalse" style="display: table-cell; padding-right: 29px; padding-top: 29px; ">
            <div class="m-formGroup">
-               <input class="a-input TrueAndFalseRadio" type="radio" name="radios2" id="true">
+               <input class="a-input TrueAndFalseRadio" @answer1Checked type="radio" name="radios2" id="true">
                <label for="true"></label>
                <label class="-text" for="true">صح</label>
            </div>
            <div class="m-formGroup">
-               <input class="a-input TrueAndFalseRadio" type="radio" name="radios2" id="false">
+               <input class="a-input TrueAndFalseRadio" @answer2Checked type="radio"  name="radios2" id="false">
                <label for="false"></label>
                <label class="-text" for="false">خطأ</label>
            </div>
@@ -61,27 +82,27 @@
            <div class="col">
 
                <div class="m-formGroup" style="display: table; padding-top: 29px;">
-                   <input class="a-input" type="radio" name="radios" id="answer1">
+                   <input class="a-input" type="radio" @answer1Checked name="radios" id="answer1">
                    <label for="answer1"></label>
                    <label class="-text" for="answer1"><input class="form-control form-control-sm" IdForRadio="answer1" value="@answer1" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الاولى"></label>
                </div>
                <div class="m-formGroup" style="display: table;">
-                   <input class="a-input" type="radio" name="radios" id="answer2">
+                   <input class="a-input" type="radio" @answer2Checked name="radios" id="answer2">
                    <label for="answer2"></label>
                    <label class="-text" for="answer2"><input class="form-control form-control-sm" IdForRadio="answer2" value="@answer2" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الثانية"></label>
                </div>
                <div class="m-formGroup" style="display: none;" id="multiAnswers3">
-                   <input class="a-input" type="radio" name="radios" id="answer3">
+                   <input class="a-input" type="radio" @answer3Checked name="radios" id="answer3">
                    <label for="answer3"></label>
                    <label class="-text" for="answer3"><input class="form-control form-control-sm" IdForRadio="answer3" value="@answer3" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الثالثة"></label>
                </div>
                <div class="m-formGroup" style="display: none;" id="multiAnswers4">
-                   <input class="a-input"  type="radio" name="radios" id="answer4">
+                   <input class="a-input"  type="radio" @answer4Checked name="radios" id="answer4">
                    <label for="answer4"></label>
                    <label class="-text" for="answer4"><input class="form-control form-control-sm" IdForRadio="answer4" value="@answer4" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الرابعة"></label>
                </div>
                <div class="m-formGroup" style="display: none;" id="multiAnswers5">
-                   <input class="a-input"  type="radio" name="radios" id="answer5">
+                   <input class="a-input"  type="radio" @answer5Checked name="radios" id="answer5">
                    <label for="answer5"></label>
                    <label class="-text" for="answer5"><input class="form-control form-control-sm" IdForRadio="answer5" value="@answer5" type="text" style="margin-top: 10px; width: 198%;" placeholder="الاجابة الخامسة"></label>
                </div>
@@ -105,23 +126,24 @@
         ShowAndHideAnswers();
     }
 
-    function ShowAndHideChoices() {
-        if ($('#AnswerType').val() == 1) {
-            $('#AnswersNumberDiv').show();
-            $('#multiAnswers').show();
-            $('#TrueAndFalse').hide();
-        }
-        else if ($('#AnswerType').val() == 0) {
-            $('#AnswersNumberDiv').hide();
-            $('#multiAnswers').hide();
-            $('#TrueAndFalse').show();
-        }
-        else {
-            $('#multiAnswers').hide();
-            $('#AnswersNumberDiv').hide();
-            $('#TrueAndFalse').hide();
-        }
-    }
+            function ShowAndHideChoices() {
+                debugger;
+                if ($('#AnswerType').val() == 1) {
+                    $('#AnswersNumberDiv').show();
+                    $('#multiAnswers').show();
+                    $('#TrueAndFalse').hide();
+                }
+                else if ($('#AnswerType').val() == 0) {
+                    $('#AnswersNumberDiv').hide();
+                    $('#multiAnswers').hide();
+                    $('#TrueAndFalse').show();
+                }
+                else {
+                    $('#multiAnswers').hide();
+                    $('#AnswersNumberDiv').hide();
+                    $('#TrueAndFalse').hide();
+                }
+            }
     function ShowAndHideAnswers() {
         if ($('#AnswersNumber').val() == 2) {
             $('#multiAnswers3').hide();

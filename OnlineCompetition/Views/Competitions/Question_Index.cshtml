@@ -1,5 +1,5 @@
 ﻿@using AdminPanel.Models
-@model List<OnlineCompetition.Models.Questions>
+@model List<QuestionVMNew>
 @{ ViewData["Title"] = "Cometition Index";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
 <script src="~/lib/jquery/dist/jquery.js"></script>
@@ -24,7 +24,7 @@
     }
 </select>
 
-<div id='addAnswerModal' class='modal fade' data-url='@Url.Action("AddOrEditAnswer")?id=0&questionId=99'>
+<div id='addAnswerModal' class='modal fade' data-url='@Url.Action("AddOrEditAnswer")?id=0&questionId=99&answerDetailId=88'>
     <div id='addAnswerContainer' class="container partialViewModal">
     </div>
 </div>
@@ -51,15 +51,15 @@
         @foreach (var Question in Model)
         {
         <tr>
-            <td>@Question.NameAR</td>
-            <td>@Question.Sort</td>
-            <td>@Question.TotalScore</td>
+            <td>@Question.Question.NameAR</td>
+            <td>@Question.Question.Sort</td>
+            <td>@Question.Question.TotalScore</td>
             <td style="text-align:center">
-                <a class="btn btn-secondary addAnswer" questionId="@Question.Id" style="cursor: pointer; color: white;" >اضف</a>
+                <a class="btn btn-secondary addAnswer" answerMasterId="@Question.AnswerMasterId" answerDetailId="@Question.AnswerDetailId" questionId="@Question.Question.Id" style="cursor: pointer; color: white;" >اضف</a>
             </td>
             <td style="text-align:center">
-                <a class="btn btn-danger" style="cursor: pointer; color: white;" questionId="@Question.Id" onclick="Delete(this)">حذف</a>
-                <a class="btn btn-primary editQuestions" style="cursor: pointer; color: white;" questionId="@Question.Id">تعديل</a>
+                <a class="btn btn-danger" style="cursor: pointer; color: white;" questionId="@Question.Question.Id" onclick="Delete(this)">حذف</a>
+                <a class="btn btn-primary editQuestions" style="cursor: pointer; color: white;" questionId="@Question.Question.Id">تعديل</a>
             </td>
         </tr>
 
@@ -70,8 +70,9 @@
     $(document).ready(function () {
         $('.addAnswer').click(function () {
             var url = $('#addAnswerModal').data('url');
-            //url = url.replace('0', $(this).attr('answerMasterId'))
-            url = url.replace('99', $(this).attr('questionId'))
+            url = url.replace('0', $(this).attr('answerMasterId'))
+            url = url.replace('99', $(this).attr('questionId'));
+            url = url.replace('88', $(this).attr('answerDetailId'));
             $.get(url, function (data) {
                 $('#addAnswerContainer').html(data);
                 $("#addAnswerModal").addClass("in");

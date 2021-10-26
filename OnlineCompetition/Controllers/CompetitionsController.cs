@@ -151,7 +151,12 @@ namespace OnlineCompetition.MVC.Controllers
             var data = await (from QU in _db.Questions
                         join COMQU in _db.CompetitionQuestionsAnswers on QU.Id equals COMQU.QuestionId
                         where QU.IsDeleted != true && COMQU.CompetitionsId == competitionIdToQuery
-                        select QU
+                        select new QuestionVMNew
+                        { 
+                            Question = QU,
+                            AnswerMasterId = COMQU.AnswersMasterId,
+                            AnswerDetailId = COMQU.AnswersDetailsId
+                        }
                         ).ToListAsync();
             ViewBag.CompetitionId = competitionIdToQuery;
             ViewBag.AllCompetitions = await _db.Competitions.Where(x=>x.IsDeleted != true).ToListAsync();
@@ -284,7 +289,7 @@ namespace OnlineCompetition.MVC.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> AddOrEditAnswer(long? id,long questionId)
+        public async Task<ActionResult> AddOrEditAnswer(long? id,long questionId,long answerDetailId)
         {
             var model = new AnsewrsVM();
             if (id != 0)
@@ -304,6 +309,7 @@ namespace OnlineCompetition.MVC.Controllers
                 model.AnswersMaster = new AnswersMaster();
                 model.AnswersDetails = new List<AnswersDetails>();
             }
+            ViewBag.AnswerDetailId = answerDetailId;
             return PartialView("_AddOrEditAnswers", model);
         }
         [HttpPost]
